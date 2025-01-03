@@ -6,7 +6,7 @@ from string import Template
 from argparse import ArgumentParser
 
 ap = ArgumentParser()
-ap.add_argument('--framework', type=str, options=["ollama", "vllm"], default="ollama")
+ap.add_argument('--framework', type=str, choices=["ollama", "vllm"], default="ollama")
 ap.add_argument('--model', type=str)
 ap.add_argument('--promtsFile', type=str, default="")
 ap.add_argument('--prePrompt', type=str, default="")
@@ -16,16 +16,18 @@ model = args.model
 prePrompt = args.prePrompt
 promtsFile = args.promtsFile
 
+modelname = model.split('/')[-1]
+
 if framework == 'ollama':
     URL = "http://localhost:11434/api/generate"
     HEADERS = {'Content-Type': 'application/x-www-form-urlencoded'}
     DATA = '{"model": "${model}", "prompt": "${prompt}", "stream": false, "keep_alive": "25m"}'
-    TESTPROMPT = "1+3?"
 else: # framework == 'vllm'
-    URL = "curl http://localhost:8000/v1/completions"
+    URL = "http://localhost:8000/v1/completions"
     HEADERS = {'Content-Type': 'application/json'}
-    DATA = '{"model": "${model}", "prompt": "${prompt}"}'
+    DATA = '{"model": "${model}", "prompt": "${prompt}", "max_tokens": 7, "temperature": 0}'
 
+TESTPROMPT = "How much is 1+3?"
 if not promtsFile:
     prompts = [TESTPROMPT]
 else:
@@ -46,10 +48,10 @@ async def do_post(session, url, model, prompt):
         data = await response.text()
         print(f">>>>> Requesting prompt {prompt}")
         hashvalue = hashlib.sha1(prompt.encode()).hexdigest()[:6]
-        filename = f'{model}_prompt_{hashvalue}.txt'
+        filename = f'{framework}_{modelname}_prompt_{hashvalue}.txt'
         with open(filename, 'w') as file:
             file.write(data)
-
+ 
 async def run_all():
     async with aiohttp.ClientSession() as session:
         post_tasks = []
