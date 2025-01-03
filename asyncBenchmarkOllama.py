@@ -6,18 +6,25 @@ from string import Template
 from argparse import ArgumentParser
 
 ap = ArgumentParser()
+ap.add_argument('--framework', type=str, options=["ollama", "vllm"], default="ollama")
 ap.add_argument('--model', type=str)
 ap.add_argument('--promtsFile', type=str, default="")
 ap.add_argument('--prePrompt', type=str, default="")
 args = ap.parse_args()
+framework = args.framework
 model = args.model
 prePrompt = args.prePrompt
 promtsFile = args.promtsFile
 
-URL = "http://localhost:11434/api/generate"
-HEADERS = {'Content-Type': 'application/x-www-form-urlencoded'}
-DATA = '{"model": "${model}", "prompt": "${prompt}", "stream": false, "keep_alive": "25m"}'
-TESTPROMPT = "1+3?"
+if framework == 'ollama':
+    URL = "http://localhost:11434/api/generate"
+    HEADERS = {'Content-Type': 'application/x-www-form-urlencoded'}
+    DATA = '{"model": "${model}", "prompt": "${prompt}", "stream": false, "keep_alive": "25m"}'
+    TESTPROMPT = "1+3?"
+else: # framework == 'vllm'
+    URL = "curl http://localhost:8000/v1/completions"
+    HEADERS = {'Content-Type': 'application/json'}
+    DATA = '{"model": "${model}", "prompt": "${prompt}"}'
 
 if not promtsFile:
     prompts = [TESTPROMPT]
