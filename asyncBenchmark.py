@@ -7,7 +7,7 @@ from string import Template
 from argparse import ArgumentParser
 
 ap = ArgumentParser()
-ap.add_argument('--framework', type=str, choices=["ollama", "vllm"], required=True)
+ap.add_argument('--framework', type=str, choices=["tgi", "vllm", "ollama"], required=True)
 ap.add_argument('--model', type=str, required=False, default="")
 ap.add_argument('--parameters', type=str, required=False, default="")
 ap.add_argument('--port', type=str, required=False)
@@ -23,6 +23,12 @@ prePrompt = args.prePrompt
 promptsFile = args.promptsFile
 verbose = args.verbose
 
+
+if parameters:
+    parameters = json.loads(parameters)
+else:
+    parameters = {}
+
 if framework == 'tgi':
     if port:
         PORT = port
@@ -30,8 +36,8 @@ if framework == 'tgi':
         PORT = 8080
     URL = f"http:/127.0.0.1:{PORT}/generate_stream"
     HEADERS = {'Content-Type': 'application/json'}
-    DATA = '{"inputs": "${prompt}", "parameters":${parameters}"}'
-    DATA = Template(DATA).substitute(model=model, parameters=parameters)
+    DATA = {"inputs": "${prompt}", "parameters": parameters}
+    DATA = json.dumps(DATA)
 elif framework == 'ollama':
     if port:
         PORT = port
@@ -39,8 +45,9 @@ elif framework == 'ollama':
         PORT = 11434
     URL = f"http://localhost:{PORT}/api/generate"
     HEADERS = {'Content-Type': 'application/x-www-form-urlencoded'}
-    DATA = '{"model": "${model}", "prompt": "${prompt}", "stream": false, "keep_alive": "25m"}'
-    DATA = Template(DATA).substitute(model=model)
+    DATA = {"model": model, "prompt": "${prompt}", "stream": false, "keep_alive": "25m"}
+    DATA.update(parameters)
+    DATA = json.dumps(DATA)
 else: # framework == 'vllm'
     if port:
         PORT = port
@@ -48,11 +55,11 @@ else: # framework == 'vllm'
         PORT = 8000
     URL = f"http://localhost:{PORT}/v1/completions"
     HEADERS = {'Content-Type': 'application/json'}
-    DATA = '{"model": "${model}", "prompt": "${prompt}"}'
-    DATA = Template(DATA).substitute(model=model)
+    DATA = {"model": model, "prompt": "${prompt}"}
+    DATA.update(parameters)
+    DATA = json.dumps(DATA)
 
 modelname = model.split('/')[-1]
-
 
 TESTPROMPT = "1+3?"
 if not promptsFile:
@@ -72,10 +79,6 @@ async def getPrompts():
 
 async def do_post(session, url, prompt):
     postData = Template(DATA).substitute(prompt=prompt)
-    if params:
-        dataDict = json.loads(postData)
-        dataDict.update(json.loads(params))
-        postData = json.dumps(dataDict)
     async with session.post(url, data=postData, headers=HEADERS) as response:
         data = await response.text()
         if verbose:
