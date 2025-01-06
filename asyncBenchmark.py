@@ -1,4 +1,5 @@
 import csv
+import json
 import hashlib
 import asyncio
 import aiohttp
@@ -6,17 +7,21 @@ from string import Template
 from argparse import ArgumentParser
 
 ap = ArgumentParser()
-ap.add_argument('--framework', type=str, choices=["ollama", "vllm"], default="ollama")
-ap.add_argument('--model', type=str)
+ap.add_argument('--framework', type=str, choices=["ollama", "vllm"], required=True)
+ap.add_argument('--model', type=str, required=True)
+ap.add_argument('--params', type=str, required=False, default="")
 ap.add_argument('--port', type=str, default="")
 ap.add_argument('--promptsFile', type=str, default="")
 ap.add_argument('--prePrompt', type=str, default="")
+ap.add_argument('-v', '--verbose',  action='store_true')
 args = ap.parse_args()
 framework = args.framework
 model = args.model
+params=args.params
 port = args.port
 prePrompt = args.prePrompt
 promptsFile = args.promptsFile
+verbose = args.verbose
 
 modelname = model.split('/')[-1]
 
@@ -35,7 +40,7 @@ else: # framework == 'vllm'
         PORT = 8000
     URL = f"http://localhost:{PORT}/v1/completions"
     HEADERS = {'Content-Type': 'application/json'}
-    DATA = '{"model": "${model}", "prompt": "${prompt}", "max_tokens": 200, "temperature": 0}'
+    DATA = '{"model": "${model}", "prompt": "${prompt}"}'
 
 TESTPROMPT = "1+3?"
 if not promptsFile:
@@ -54,9 +59,16 @@ async def getPrompts():
         yield prompt
 
 async def do_post(session, url, model, prompt):
-    async with session.post(url, data=Template(DATA).substitute(model=model, prompt=prompt), headers=HEADERS) as response:
+    postData = Template(DATA).substitute(model=model, prompt=prompt)
+    if params:
+        dataDict = json.loads(postData)
+        dataDict.update(json.loads(params))
+        postData = json.dumps(dataDict)
+    async with session.post(url, data=postData, headers=HEADERS) as response:
         data = await response.text()
-        print(f">>>>> Requesting prompt {prompt}")
+        if verbose:
+            print(f"[QUERY]: {postData}")
+            print(f"[REPONSE]: {data}")
         hashvalue = hashlib.sha1(prompt.encode()).hexdigest()[:8]
         filename = f'{framework}_{modelname}_{hashvalue}.txt'
         with open(filename, 'w') as file:
