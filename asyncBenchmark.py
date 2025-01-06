@@ -8,24 +8,31 @@ from argparse import ArgumentParser
 
 ap = ArgumentParser()
 ap.add_argument('--framework', type=str, choices=["ollama", "vllm"], required=True)
-ap.add_argument('--model', type=str, required=True)
-ap.add_argument('--params', type=str, required=False, default="")
-ap.add_argument('--port', type=str, default="")
-ap.add_argument('--promptsFile', type=str, default="")
-ap.add_argument('--prePrompt', type=str, default="")
+ap.add_argument('--model', type=str, required=False, default="")
+ap.add_argument('--parameters', type=str, required=False, default="")
+ap.add_argument('--port', type=str, required=False)
+ap.add_argument('--promptsFile', type=str, required=False, default="")
+ap.add_argument('--prePrompt', type=str, required=False, default="")
 ap.add_argument('-v', '--verbose',  action='store_true')
 args = ap.parse_args()
 framework = args.framework
 model = args.model
-params=args.params
+parameters = args.parameters
 port = args.port
 prePrompt = args.prePrompt
 promptsFile = args.promptsFile
 verbose = args.verbose
 
-modelname = model.split('/')[-1]
-
-if framework == 'ollama':
+if framework == 'tgi':
+    if port:
+        PORT = port
+    else:
+        PORT = 8080
+    URL = f"http:/127.0.0.1:{PORT}/generate_stream"
+    HEADERS = {'Content-Type': 'application/json'}
+    DATA = '{"inputs": "${prompt}", "parameters":${parameters}"}'
+    DATA = Template(DATA).substitute(model=model, parameters=parameters)
+elif framework == 'ollama':
     if port:
         PORT = port
     else:
@@ -33,6 +40,7 @@ if framework == 'ollama':
     URL = f"http://localhost:{PORT}/api/generate"
     HEADERS = {'Content-Type': 'application/x-www-form-urlencoded'}
     DATA = '{"model": "${model}", "prompt": "${prompt}", "stream": false, "keep_alive": "25m"}'
+    DATA = Template(DATA).substitute(model=model)
 else: # framework == 'vllm'
     if port:
         PORT = port
@@ -41,6 +49,10 @@ else: # framework == 'vllm'
     URL = f"http://localhost:{PORT}/v1/completions"
     HEADERS = {'Content-Type': 'application/json'}
     DATA = '{"model": "${model}", "prompt": "${prompt}"}'
+    DATA = Template(DATA).substitute(model=model)
+
+modelname = model.split('/')[-1]
+
 
 TESTPROMPT = "1+3?"
 if not promptsFile:
@@ -58,8 +70,8 @@ async def getPrompts():
     for prompt in prompts:
         yield prompt
 
-async def do_post(session, url, model, prompt):
-    postData = Template(DATA).substitute(model=model, prompt=prompt)
+async def do_post(session, url, prompt):
+    postData = Template(DATA).substitute(prompt=prompt)
     if params:
         dataDict = json.loads(postData)
         dataDict.update(json.loads(params))
@@ -79,7 +91,7 @@ async def run_all():
         post_tasks = []
         # prepare the coroutines that post
         async for prompt in getPrompts():
-            post_tasks.append(do_post(session, url=URL, model=model, prompt=prompt))
+            post_tasks.append(do_post(session, url=URL, prompt=prompt))
         # now execute them all at once
         await asyncio.gather(*post_tasks)
 
