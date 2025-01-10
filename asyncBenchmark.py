@@ -34,7 +34,7 @@ if framework == 'tgi':
         PORT = port
     else:
         PORT = 8080
-    URL = f"http:/127.0.0.1:{PORT}/generate_stream"
+    URL = f"http://localhost:{PORT}/generate_stream"
     HEADERS = {'Content-Type': 'application/json'}
     DATA = {"inputs": "${prompt}", "parameters": parameters}
     DATA = json.dumps(DATA)
@@ -45,7 +45,7 @@ elif framework == 'ollama':
         PORT = 11434
     URL = f"http://localhost:{PORT}/api/generate"
     HEADERS = {'Content-Type': 'application/x-www-form-urlencoded'}
-    DATA = {"model": model, "prompt": "${prompt}", "stream": false, "keep_alive": "25m"}
+    DATA = {"model": model, "prompt": "${prompt}", "keep_alive": "25m"}
     DATA.update(parameters)
     DATA = json.dumps(DATA)
 else: # framework == 'vllm'
