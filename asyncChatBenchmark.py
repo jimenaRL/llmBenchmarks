@@ -1,6 +1,3 @@
-# python asyncChatBenchmark.py --model=HuggingFaceH4/zephyr-7b-beta --framework=vllm -v --system_content="You are an expert in European politics. Please classify the following Twitter profile bio as 'Liberal' or 'Not-Liberal' according to whether the author of the text holds liberal views or beliefs, including but not limited to positive views on abortion, gender equality, and same-sex marriage. The response should be in the form of a single term with the name of the category: 'Liberal' or 'Not-Liberal'. This is bio:" --user_content="Humanist, Democratic and Naturophile"
-# example here before
-
 import csv
 import json
 import hashlib
@@ -89,10 +86,9 @@ else: # framework == 'vllm'
 modelname = model.split('/')[-1]
 
 if messages_file:
-    with open(promptsFile) as csvfile:
+    with open(messages_file) as csvfile:
         reader = csv.DictReader(csvfile)
-        system_contents = [row['system'] for row in reader]
-        user_contents = [row['user'] for row in reader]
+        messages = [[row['system'], row['user']] for row in reader]
 elif system_content & user_content:
         system_contents = [system_content]
         user_contents = [user_content]
@@ -100,11 +96,9 @@ else:
     raise ValueError(
         "Must specify `messages_file` of `system_content` and `user_content`.")
 
-messages = zip(system_contents, user_contents)
-
 async def getMessages():
-    for system_content, user_content in messages:
-        yield system_content, user_content
+    for message in messages:
+        yield message[0], message[1]
 
 async def do_post(session, url, system_content, user_content):
     postData = Template(DATA).substitute(system_content=system_content, user_content=user_content)
@@ -113,7 +107,7 @@ async def do_post(session, url, system_content, user_content):
         if verbose:
             print(f"[QUERY]: {postData}")
             print(f"[REPONSE]: {data}")
-        hashvalue = hashlib.sha1(system_content+user_content.encode()).hexdigest()[:8]
+        hashvalue = hashlib.sha1((system_content+user_content).encode()).hexdigest()[:8]
         filename = f'{framework}_{modelname}_{hashvalue}.txt'
         with open(filename, 'w') as file:
             file.write(data)
