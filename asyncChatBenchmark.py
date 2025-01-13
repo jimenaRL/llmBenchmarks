@@ -49,16 +49,23 @@ if framework == 'tgi':
     }
     DATA.update(parameters)
     DATA = json.dumps(DATA)
-
 elif framework == 'ollama':
     if port:
         PORT = port
     else:
         PORT = 11434
-    URL = f"http://localhost:{PORT}/api/generate"
+    URL = f"http://localhost:{PORT}/api/chat"
     HEADERS = {'Content-Type': 'application/x-www-form-urlencoded'}
-    DATA = {"model": model, "prompt": "${prompt}", "keep_alive": "25m"}
-    DATA.update(parameters)
+    DATA = {
+        "model": model,
+        "stream": False,
+        "keep_alive": "25m",
+        "messages": [
+            {"role": "system", "content": "${system_content}"},
+            {"role": "user", "content": "${user_content}"}
+        ]
+    }
+    DATA["options"] = parameters
     DATA = json.dumps(DATA)
 else: # framework == 'vllm'
     if port:
