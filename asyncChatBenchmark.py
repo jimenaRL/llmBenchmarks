@@ -34,10 +34,19 @@ if framework == 'tgi':
         PORT = port
     else:
         PORT = 8080
-    URL = f"http://localhost:{PORT}/generate_stream"
+    URL = f"http://localhost:{PORT}/v1/chat/completions"
     HEADERS = {'Content-Type': 'application/json'}
-    DATA = {"inputs": "${prompt}", "parameters": parameters}
+    DATA = {
+        "model": "tgi",
+        "messages": [
+            {"role": "system", "content": "${system_content}"},
+            {"role": "user", "content": "${user_content}"}
+        ],
+        "stream": "false"
+    }
+    DATA.update(parameters)
     DATA = json.dumps(DATA)
+
 elif framework == 'ollama':
     if port:
         PORT = port
