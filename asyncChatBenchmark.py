@@ -1,3 +1,6 @@
+# python asyncChatBenchmark.py --model=HuggingFaceH4/zephyr-7b-beta --framework=vllm -v --system_content="You are an expert in European politics. Please classify the following Twitter profile bio as 'Liberal' or 'Not-Liberal' according to whether the author of the text holds liberal views or beliefs, including but not limited to positive views on abortion, gender equality, and same-sex marriage. The response should be in the form of a single term with the name of the category: 'Liberal' or 'Not-Liberal'. This is bio:" --user_content="Humanist, Democratic and Naturophile"
+# example here before
+
 import csv
 import json
 import hashlib
@@ -76,30 +79,18 @@ else: # framework == 'vllm'
 
 modelname = model.split('/')[-1]
 
-TESTPROMPT = "1+3?"
-if not promptsFile:
-    prompts = [TESTPROMPT]
-else:
-    with open(promptsFile) as csvfile:
-        reader = csv.DictReader(csvfile)
-        prompts = [row['prompt'] for row in reader]
+async def getMessages():
+    for _ in [10]:
+        yield system_content, user_content
 
-# add pre prompt
-if prePrompt:
-    prompts = [prePrompt+p for p in prompts]
-
-async def getPrompts():
-    for prompt in prompts:
-        yield prompt
-
-async def do_post(session, url, prompt):
-    postData = Template(DATA).substitute(prompt=prompt)
+async def do_post(session, url, system_content, user_content):
+    postData = Template(DATA).substitute(system_content=system_content, user_content=user_content)
     async with session.post(url, data=postData, headers=HEADERS) as response:
         data = await response.text()
         if verbose:
             print(f"[QUERY]: {postData}")
             print(f"[REPONSE]: {data}")
-        hashvalue = hashlib.sha1(prompt.encode()).hexdigest()[:8]
+        hashvalue = 'todo'  # hashlib.sha1(system_content+user_content.encode()).hexdigest()[:8]
         filename = f'{framework}_{modelname}_{hashvalue}.txt'
         with open(filename, 'w') as file:
             file.write(data)
@@ -108,8 +99,8 @@ async def run_all():
     async with aiohttp.ClientSession() as session:
         post_tasks = []
         # prepare the coroutines that post
-        async for prompt in getPrompts():
-            post_tasks.append(do_post(session, url=URL, prompt=prompt))
+        async for system_content, user_content in getMessages():
+            post_tasks.append(do_post(session, url=URL, system_content=system_content, user_content=user_content))
         # now execute them all at once
         await asyncio.gather(*post_tasks)
 
