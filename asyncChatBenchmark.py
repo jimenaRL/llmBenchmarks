@@ -16,6 +16,7 @@ ap.add_argument('--parameters', type=str, required=False, default="")
 ap.add_argument('--port', type=str, required=False)
 ap.add_argument('--system_content', type=str, required=False, default="")
 ap.add_argument('--user_content', type=str, required=False, default="")
+ap.add_argument('--messages_file', type=str, required=False, default="")
 ap.add_argument('-v', '--verbose',  action='store_true')
 args = ap.parse_args()
 framework = args.framework
@@ -24,6 +25,7 @@ parameters = args.parameters
 port = args.port
 user_content = args.user_content
 system_content = args.system_content
+messages_file = args.messages_file
 verbose = args.verbose
 
 
@@ -86,8 +88,22 @@ else: # framework == 'vllm'
 
 modelname = model.split('/')[-1]
 
+if messages_file:
+    with open(promptsFile) as csvfile:
+        reader = csv.DictReader(csvfile)
+        system_contents = [row['system'] for row in reader]
+        user_contents = [row['user'] for row in reader]
+elif system_content & user_content:
+        system_contents = [system_content]
+        user_contents = [user_content]
+else:
+    raise ValueError(
+        "Must specify `messages_file` of `system_content` and `user_content`.")
+
+messages = zip(system_contents, user_contents)
+
 async def getMessages():
-    for _ in [10]:
+    for system_content, user_content in messages:
         yield system_content, user_content
 
 async def do_post(session, url, system_content, user_content):
@@ -97,7 +113,7 @@ async def do_post(session, url, system_content, user_content):
         if verbose:
             print(f"[QUERY]: {postData}")
             print(f"[REPONSE]: {data}")
-        hashvalue = 'todo'  # hashlib.sha1(system_content+user_content.encode()).hexdigest()[:8]
+        hashvalue = hashlib.sha1(system_content+user_content.encode()).hexdigest()[:8]
         filename = f'{framework}_{modelname}_{hashvalue}.txt'
         with open(filename, 'w') as file:
             file.write(data)
