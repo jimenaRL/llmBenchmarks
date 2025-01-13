@@ -45,7 +45,7 @@ if framework == 'tgi':
             {"role": "system", "content": "${system_content}"},
             {"role": "user", "content": "${user_content}"}
         ],
-        "stream": "false"
+        "stream": False
     }
     DATA.update(parameters)
     DATA = json.dumps(DATA)
