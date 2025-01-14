@@ -5,9 +5,13 @@ vllm serve llava-hf/llava-1.5-7b-hf --chat-template template_llava.jinja
 """
 
 import csv
+import json
 import base64
 import requests
-from openai import OpenAI
+import hashlib
+import asyncio
+import aiohttp
+from string import Template
 from argparse import ArgumentParser
 
 ap = ArgumentParser()
@@ -19,6 +23,7 @@ ap.add_argument('-v', '--verbose',  action='store_true')
 args = ap.parse_args()
 images_urls_file = args.images_urls_file
 port = args.port
+max_tokens = args.max_tokens
 text = args.text
 verbose = args.verbose
 
@@ -59,7 +64,7 @@ async def getImagesUrls():
     for image_url in images_urls:
         yield image_url
 
-async def do_post(session, url, system_content, user_content):
+async def do_post(session, url, image_url):
     postData = Template(DATA).substitute(image_url=image_url)
     async with session.post(url, data=postData, headers=HEADERS) as response:
         data = await response.text()
@@ -67,7 +72,7 @@ async def do_post(session, url, system_content, user_content):
             print(f"[QUERY]: {postData}")
             print(f"[REPONSE]: {data}")
         hashvalue = hashlib.sha1((image_url+text).encode()).hexdigest()[:8]
-        filename = f'{text}_{image_url}.txt'
+        filename = f'{hashvalue}.txt'
         with open(filename, 'w') as file:
             file.write(data)
 
@@ -86,67 +91,6 @@ asyncio.run(run_all())
 
 
 
-
-
-
-
-
-
-
-
-# Modify OpenAI's API key and API base to use vLLM's API server.
-openai_api_key = "EMPTY"
-openai_api_base = f"http://localhost:{port}/v1"
-
-client = OpenAI(
-    # defaults to os.environ.get("OPENAI_API_KEY")
-    api_key=openai_api_key,
-    base_url=openai_api_base,
-)
-
-models = client.models.list()
-model = models.data[0].id
-
-# Use base64 encoded image in the payload
-def encode_image_base64_from_url(image_url: str) -> str:
-    """Encode an image retrieved from a remote url to base64 format."""
-
-    with requests.get(image_url) as response:
-        response.raise_for_status()
-        result = base64.b64encode(response.content).decode('utf-8')
-
-    return result
-
-
-
-for image_url in images_urls:
-
-    image_base64 = encode_image_base64_from_url(image_url=image_url)
-    chat_completion_from_base64 = client.chat.completions.create(
-        messages=[{
-            "role": "user",
-            "content": [
-                {
-                    "type": "text",
-                    "text": text
-                },
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:image/jpeg;base64, {image_base64}"
-                    },
-                },
-            ],
-        }],
-        model=model,
-        max_tokens=max_tokens,
-    )
-
-    result = chat_completion_from_base64.choices[0].message.content
-    print(f"_______________")
-    print(f"text: {text}")
-    print(f"Image url: {image_url}")
-    print(f"Chat completion output: {result}")
 
 
 
