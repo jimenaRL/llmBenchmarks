@@ -85,10 +85,14 @@ else: # framework == 'vllm'
 
 modelname = model.split('/')[-1]
 
-if messages_file:
+if messages_file and not system_content:
     with open(messages_file) as csvfile:
         reader = csv.DictReader(csvfile)
         messages = [[row['system'], row['user']] for row in reader]
+elif messages_file and system_content:
+    with open(messages_file) as csvfile:
+        reader = csv.DictReader(csvfile)
+        messages = [[system_content, row['user']] for row in reader]
 elif system_content & user_content:
         system_contents = [system_content]
         user_contents = [user_content]
