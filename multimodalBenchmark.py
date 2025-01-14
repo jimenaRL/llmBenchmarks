@@ -13,10 +13,12 @@ from argparse import ArgumentParser
 ap = ArgumentParser()
 ap.add_argument('--images_urls_file', type=str, required=False, default="")
 ap.add_argument('--port', type=str, required=False, default='8000')
+ap.add_argument('--text', type=str, required=False, default='What’s in this image?')
 ap.add_argument('-v', '--verbose',  action='store_true')
 args = ap.parse_args()
 images_urls_file = args.images_urls_file
 port = args.port
+text = args.text
 verbose = args.verbose
 
 TESTIMAGEURL = "https://www.oceano.org/wp-content/uploads/2019/06/06_M%C3%A9duse-Pelagia-noctiluca_M_Dagnino-scaled.jpg"
@@ -60,7 +62,7 @@ for image_url in images_urls:
             "content": [
                 {
                     "type": "text",
-                    "text": "What’s in this image?"
+                    "text": text
                 },
                 {
                     "type": "image_url",
@@ -76,6 +78,7 @@ for image_url in images_urls:
 
     result = chat_completion_from_base64.choices[0].message.content
     print(f"_______________")
+    print(f"text: {text}")
     print(f"Image url: {image_url}")
     print(f"Chat completion output: {result}")
 
