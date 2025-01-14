@@ -1,7 +1,7 @@
 """An example showing how to use ollame to serve mutimodal LLMs.
 
-Launch the vLLM server first in a separated terminal with the following command:
-docker run -d --runtime nvidia --gpus all -v ollama:/root/.ollama -p {port}:11434 --name ollama ollama/ollama
+Launch the Ollama server first in a separated terminal with the following command:
+docker run -d --runtime nvidia --gpus all -v ollama:/root/.ollama -p 11435:11434 --name ollama ollama/ollama
 """
 
 import csv
@@ -17,7 +17,7 @@ from argparse import ArgumentParser
 ap = ArgumentParser()
 ap.add_argument('--images_urls_file', type=str, required=False, default="")
 ap.add_argument('--model', type=str, required=False, default="llama3.2-vision")
-ap.add_argument('--port', type=int, required=False, default=8000)
+ap.add_argument('--port', type=int, required=False, default=11435)
 ap.add_argument('--text', type=str, required=False, default="I'd like you to look at an image and describe it for me")
 ap.add_argument('-v', '--verbose',  action='store_true')
 args = ap.parse_args()
