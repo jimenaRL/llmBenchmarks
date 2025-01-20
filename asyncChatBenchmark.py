@@ -14,13 +14,6 @@ Here are before are some examples using zephyr model on CPU, 1 GPU or 2 GPUs.
 
 [vllm CPU]
 
-vllm serve HuggingFaceH4/zephyr-7b-beta \
-    --port {port} \
-    --gpu_memory_utilization 1 \
-    --max_model_len 21500
-
-or
-
 docker run -d --name myVLLMChatCompleteionServerCPU \                 
     -v /home/{username}/storage:/root/.cache/huggingface \
     -p {port}:8000 \
@@ -28,6 +21,13 @@ docker run -d --name myVLLMChatCompleteionServerCPU \
     --model HuggingFaceH4/zephyr-7b-beta
 
 [vllm 1 GPU]
+
+vllm serve HuggingFaceH4/zephyr-7b-beta \
+    --port {port} \
+    --gpu_memory_utilization 1 \
+    --max_model_len 21500
+
+or
 
 docker run -d --name myVLLMChatCompleteionServer1GPU --runtime nvidia --gpus '"device=0"' \
     -v /home/{username}/storage:/root/.cache/huggingface \
@@ -160,7 +160,7 @@ elif system_content & user_content:
         user_contents = [user_content]
 else:
     raise ValueError(
-        "Must specify `messages_file` of `system_content` and `user_content`.")
+        "Must specify `messages_file` or `system_content` and `user_content`.")
 
 async def getMessages():
     for message in messages:
