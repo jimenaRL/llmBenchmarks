@@ -1,8 +1,23 @@
 """
 To use this script with vllm or tgi frameworks on gépéhu, you must first launch a chat completion server.
-Here are some examples using zephyr model on CPU, 1 GPU or 2 GPUs. 
+Here are before are some examples using zephyr model on CPU, 1 GPU or 2 GPUs. 
+
+time python asyncChatBenchmark.py \    
+    --framework={vllm or tgi} \
+    --port {port} \
+    --model=HuggingFaceH4/zephyr-7b-beta \
+    --parameters='{"temperature": 0.7, "max_tokens": 16, "top_k": 50, "top_p": 0.95, "repetition_penalty": 1.2}' \
+    --messages_file=twitterBios.csv \
+    --system_content="You are an expert in sports. Please classify the following Twitter profile bio as 'sport-fan' or 'not-sport-fan'. This is bio:"
 
 [vllm CPU]
+
+vllm serve HuggingFaceH4/zephyr-7b-beta \
+    --port {port} \
+    --gpu_memory_utilization 1 \
+    --max_model_len 21500
+
+or
 
 docker run -d --name myVLLMChatCompleteionServerCPU \                 
     -v /home/{username}/storage:/root/.cache/huggingface \
