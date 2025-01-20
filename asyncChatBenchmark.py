@@ -1,6 +1,5 @@
 """
-To use this script with vllm or tgi frameworks on gépéhu, you must first launch a chat completion server.
-Here are before are some examples using zephyr model on CPU, 1 GPU or 2 GPUs. 
+Usage example: 
 
 time python asyncChatBenchmark.py \    
     --framework={vllm or tgi} \
@@ -9,6 +8,9 @@ time python asyncChatBenchmark.py \
     --parameters='{"temperature": 0.7, "max_tokens": 16, "top_k": 50, "top_p": 0.95, "repetition_penalty": 1.2}' \
     --messages_file=twitterBios.csv \
     --system_content="You are an expert in sports. Please classify the following Twitter profile bio as 'sport-fan' or 'not-sport-fan'. This is bio:"
+
+To use this script with vllm or tgi frameworks on gépéhu, you must first launch a chat completion server.
+Here are before are some examples using zephyr model on CPU, 1 GPU or 2 GPUs.
 
 [vllm CPU]
 
