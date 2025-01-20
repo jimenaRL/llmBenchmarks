@@ -1,7 +1,8 @@
 """
-To use this script with vllm or tgi frameworks on gépéhu, you must first launch a chat completion server as follows:
+To use this script with vllm or tgi frameworks on gépéhu, you must first launch a chat completion server.
+Here are some examples using zephyr model on CPU, 1 GPU or 2 GPUs. 
 
-[vllm 1 CPU]
+[vllm CPU]
 
 docker run -d --name myVLLMChatCompleteionServerCPU \                 
     -v /home/{username}/storage:/root/.cache/huggingface \
