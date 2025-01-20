@@ -1,3 +1,47 @@
+"""
+To use this script with vllm or tgi frameworks on gépéhu, you must first launch a chat completion server as follows:
+
+[vllm 1 CPU]
+
+docker run -d --name myVLLMChatCompleteionServerCPU \                 
+    -v /home/{username}/storage:/root/.cache/huggingface \
+    -p {port}:8000 \
+    vllm-cpu-env \
+    --model HuggingFaceH4/zephyr-7b-beta
+
+[vllm 1 GPU]
+
+docker run -d --name myVLLMChatCompleteionServer1GPU --runtime nvidia --gpus '"device=0"' \
+    -v /home/{username}/storage:/root/.cache/huggingface \
+    -p {port}:8000 \           
+    --env "PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True" \
+    --ipc=host \                                         
+    vllm/vllm-openai:latest \              
+    --model HuggingFaceH4/zephyr-7b-beta \
+    --gpu_memory_utilization 1 \
+    --max_model_len 21500
+    
+[tgi 1 GPU]
+
+docker run -d --name myTGIChatCompleteionServer1GPU --gpus '"device=1"' \
+    --shm-size 1g \
+    -p {port}:80 \
+    -v /home/{username}/storage:/data \
+    ghcr.io/huggingface/text-generation-inference:3.0.0 \
+    --model-id HuggingFaceH4/zephyr-7b-beta
+
+[tgi 2 GPU]
+
+docker run -d --name myTGIChatCompleteionServer2GPUs --gpus all \
+    --shm-size 1g \
+    -p {port}:80 \
+    -v /home/{username}/storage/hf_cache:/data \
+    ghcr.io/huggingface/text-generation-inference:3.0.0 \
+    --model-id HuggingFaceH4/zephyr-7b-beta \
+    --num-shard=2
+
+"""
+
 import csv
 import json
 import hashlib
