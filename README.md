@@ -1,4 +1,7 @@
-# LLM serving using [vllm](https://github.com/vllm-project/vllm/) or [tgi](https://github.com/huggingface/text-generation-inference/).
+# LLM serving using inference optimized frameworks
+
+- [vllm](https://github.com/vllm-project/vllm/)
+- [tgi](https://github.com/huggingface/text-generation-inference/)
 
 Scripts usage example: 
 
