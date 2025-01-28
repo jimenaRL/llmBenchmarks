@@ -14,7 +14,7 @@ time python asyncChatBenchmark.py \
 
 To use the [async chat script](https://github.com/jimenaRL/llmBenchmarks/blob/main/asyncChatBenchmark.py) with vllm or tgi frameworks on gépéhu, you must first launch a chat completion server. Here are some examples using zephyr model on CPU, 1 GPU or 2 GPUs.
 
-[vllm CPU]
+## vllm CPU
 
 ```
 docker run -d --name myVLLMChatCompleteionServerCPU \                 
