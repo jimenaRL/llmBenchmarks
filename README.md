@@ -1,6 +1,7 @@
-Usage example: 
+Scripts usage example: 
 
-```time python asyncChatBenchmark.py \    
+```
+time python asyncChatBenchmark.py \    
     --framework={vllm or tgi} \
     --port {port} \
     --model=HuggingFaceH4/zephyr-7b-beta \
@@ -14,7 +15,8 @@ Here are some examples using zephyr model on CPU, 1 GPU or 2 GPUs.
 
 [vllm CPU]
 
-```docker run -d --name myVLLMChatCompleteionServerCPU \                 
+```
+docker run -d --name myVLLMChatCompleteionServerCPU \                 
     -v /home/{username}/storage:/root/.cache/huggingface \
     -p {port}:8000 \
     vllm-cpu-env \
@@ -23,7 +25,8 @@ Here are some examples using zephyr model on CPU, 1 GPU or 2 GPUs.
 
 [vllm 1 GPU]
 
-```vllm serve HuggingFaceH4/zephyr-7b-beta \
+```
+vllm serve HuggingFaceH4/zephyr-7b-beta \
     --port {port} \
     --gpu_memory_utilization 1 \
     --max_model_len 21500
@@ -45,7 +48,8 @@ docker run -d --name myVLLMChatCompleteionServer1GPU --runtime nvidia --gpus '"d
 [tgi 1 GPU]
 
 
-```docker run -d --name myTGIChatCompleteionServer1GPU --gpus '"device=1"' \
+```
+docker run -d --name myTGIChatCompleteionServer1GPU --gpus '"device=1"' \
     --shm-size 1g \
     -p {port}:80 \
     -v /home/{username}/storage:/data \
@@ -54,7 +58,8 @@ docker run -d --name myVLLMChatCompleteionServer1GPU --runtime nvidia --gpus '"d
 ```
 [tgi 2 GPU]
 
-```docker run -d --name myTGIChatCompleteionServer2GPUs --gpus all \
+```
+docker run -d --name myTGIChatCompleteionServer2GPUs --gpus all \
     --shm-size 1g \
     -p {port}:80 \
     -v /home/{username}/storage/hf_cache:/data \
