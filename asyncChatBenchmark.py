@@ -1,3 +1,4 @@
+import os
 import csv
 import json
 import hashlib
@@ -12,6 +13,7 @@ ap.add_argument('--model', type=str, required=False, default="")
 ap.add_argument('--parameters', type=str, required=False, default="")
 ap.add_argument('--port', type=str, required=False)
 ap.add_argument('--system_content', type=str, required=False, default="")
+ap.add_argument('--output_folder', type=str, required=False, default="outputs")
 ap.add_argument('--user_content', type=str, required=False, default="")
 ap.add_argument('--messages_file', type=str, required=False, default="")
 ap.add_argument('-v', '--verbose',  action='store_true')
@@ -21,6 +23,7 @@ model = args.model
 parameters = args.parameters
 port = args.port
 user_content = args.user_content
+output_folder = args.output_folder
 system_content = args.system_content
 messages_file = args.messages_file
 verbose = args.verbose
@@ -112,7 +115,7 @@ async def do_post(session, url, system_content, user_content):
             print(f"[QUERY]: {postData}")
             print(f"[REPONSE]: {data}")
         hashvalue = hashlib.sha1((system_content+user_content).encode()).hexdigest()[:8]
-        filename = f'{framework}_{modelname}_{hashvalue}.txt'
+        filename = os.path.join(output_folder, f'{framework}_{modelname}_{hashvalue}.txt')
         with open(filename, 'w') as file:
             file.write(data)
 
