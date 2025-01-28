@@ -10,8 +10,7 @@ time python asyncChatBenchmark.py \
     --system_content="You are an expert in sports. Please classify the following Twitter profile bio as 'sport-fan' or 'not-sport-fan'. This is the bio:"
 ```
 
-To use this script with vllm or tgi frameworks on gépéhu, you must first launch a chat completion server.
-Here are some examples using zephyr model on CPU, 1 GPU or 2 GPUs.
+To use the [async chat script](https://github.com/jimenaRL/llmBenchmarks/blob/main/asyncChatBenchmark.py) with vllm or tgi frameworks on gépéhu, you must first launch a chat completion server. Here are some examples using zephyr model on CPU, 1 GPU or 2 GPUs.
 
 [vllm CPU]
 
