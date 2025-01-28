@@ -1,4 +1,4 @@
-LLM serving using [vllm](https://github.com/vllm-project/vllm/) or [tgi](https://github.com/huggingface/text-generation-inference/).
+# LLM serving using [vllm](https://github.com/vllm-project/vllm/) or [tgi](https://github.com/huggingface/text-generation-inference/).
 
 Scripts usage example: 
 
@@ -14,7 +14,7 @@ time python asyncChatBenchmark.py \
 
 To use the [async chat script](https://github.com/jimenaRL/llmBenchmarks/blob/main/asyncChatBenchmark.py) with vllm or tgi frameworks on gépéhu, you must first launch a chat completion server. Here are some examples using zephyr model on CPU, 1 GPU or 2 GPUs.
 
-## vllm CPU
+### vllm CPU
 
 ```
 docker run -d --name myVLLMChatCompleteionServerCPU \                 
@@ -24,7 +24,7 @@ docker run -d --name myVLLMChatCompleteionServerCPU \
     --model HuggingFaceH4/zephyr-7b-beta
 ```
 
-[vllm 1 GPU]
+### vllm 1 GPU
 
 ```
 vllm serve HuggingFaceH4/zephyr-7b-beta \
@@ -46,7 +46,7 @@ docker run -d --name myVLLMChatCompleteionServer1GPU --runtime nvidia --gpus '"d
     --max_model_len 21500
 ``` 
 
-[tgi 1 GPU]
+### tgi 1 GPU
 
 
 ```
@@ -57,7 +57,8 @@ docker run -d --name myTGIChatCompleteionServer1GPU --gpus '"device=1"' \
     ghcr.io/huggingface/text-generation-inference:3.0.0 \
     --model-id HuggingFaceH4/zephyr-7b-beta
 ```
-[tgi 2 GPU]
+
+### tgi 2 GPU
 
 ```
 docker run -d --name myTGIChatCompleteionServer2GPUs --gpus all \
