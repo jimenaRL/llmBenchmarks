@@ -18,9 +18,6 @@ $ source environments/vllmEnv/bin/activate
 
 $ pip install vllm==0.8.2
 
-5. Clone vllm repository to acces examples and templates
-
-$ git clone https://github.com/vllm-project/vllm.git
 
 6. Launch the vllm serve with llava-1.5 model
 
@@ -28,8 +25,10 @@ $ vllm serve llava-hf/llava-1.5-7b-hf --chat-template vllm/examples/template_lla
 
 Pay attention to the "&" at the end of teh command, this allows to continue to use the same interactive terminal on IN2P3
 with the vllm server running on a separate process. 
+
 We also disable stats logs for a cleaner terminal. 
 
+We use the chat template for llava model accesible at the [vllm git repository](https://github.com/vllm-project/vllm/tree/main/examples).
 """
 import base64
 
@@ -38,7 +37,7 @@ from openai import OpenAI
 
 from vllm.utils import FlexibleArgumentParser
 
-DEFAULT_IMAGE_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg"
+DEFAULT_IMAGE_URL = "https://fr.wikipedia.org/wiki/Mouvement_des_Gilets_jaunes#/media/Fichier:GJ_20190105_151557_(46642348481).jpg"
 
 # Modify OpenAI's API key and API base to use vLLM's API server.
 openai_api_key = "EMPTY"
@@ -57,7 +56,6 @@ model = models.data[0].id
 def encode_base64_content_from_url(content_url: str) -> str:
     """Encode a content retrieved from a remote url to base64 format."""
 
-
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
 
     with requests.get(content_url, headers=headers) as response:
@@ -69,7 +67,6 @@ def encode_base64_content_from_url(content_url: str) -> str:
 def run(image_url, content_text) -> None:
 
     ## Use image url in the payload
-    image_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg"
     chat_completion_from_url = client.chat.completions.create(
         messages=[{
             "role":
