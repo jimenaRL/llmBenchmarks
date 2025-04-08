@@ -5,7 +5,7 @@ and run online serving with OpenAI client on an interactive server on IN2P3 comp
 
 $ srun -p gpu_interactive -t 0-03:00 --mem 16G --gres=gpu:h100:1 --pty bash -i
 
-2. Check that GPU card is available and running 
+2. Check that GPU card is available and running
 
 $ nvidia-smi
 
@@ -74,7 +74,7 @@ def run(image_url, content_text, encode_image, verbose) -> None:
             "content": [
                 {
                     "type": "text",
-                    "text": "What's in this image?"
+                    "text": content_text
                 },
                 {
                     "type": "image_url",
@@ -112,10 +112,10 @@ def run(image_url, content_text, encode_image, verbose) -> None:
     if verbose:
         log = "Chat completion output from "
         if encode_image:
-            log += "base64 encoded "
+            log += "base64 encoded"
         else:
-            log += "url "
-        print(f"image: {result}")
+            log += "url"
+        print(f"{log} image: {result}")
 
     with open("output.txt", "w") as f:
         f.write(result)
