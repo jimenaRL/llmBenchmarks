@@ -64,39 +64,13 @@ def encode_base64_content_from_url(content_url: str) -> str:
 
     return result
 
-def run(image_url, content_text) -> None:
+def run(image_url, content_text, encode_image, verbose) -> None:
 
-    ## Use image url in the payload
-    chat_completion_from_url = client.chat.completions.create(
-        messages=[{
-            "role":
-            "user",
-            "content": [
-                {
-                    "type": "text",
-                    "text": content_text
-                },
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": image_url
-                    },
-                },
-            ],
-        }],
-        model=model,
-        max_completion_tokens=64,
-    )
-
-    result = chat_completion_from_url.choices[0].message.content
-    print("Chat completion output from image url:", result)
-
-    ## Use base64 encoded image in the payload
-    image_base64 = encode_base64_content_from_url(image_url)
-    chat_completion_from_base64 = client.chat.completions.create(
-        messages=[{
-            "role":
-            "user",
+    # Use base64 encoded image in the payload
+    if encode_image:
+        image_base64 = encode_base64_content_from_url(image_url)
+        messages = [{
+            "role": "user",
             "content": [
                 {
                     "type": "text",
@@ -109,19 +83,46 @@ def run(image_url, content_text) -> None:
                     },
                 },
             ],
-        }],
-        model=model,
-        max_completion_tokens=64,
-    )
+        }]
 
-    result = chat_completion_from_base64.choices[0].message.content
-    print("Chat completion output from base64 encoded image:", result)
+    # Use image url in the payload
+    else:
+        messages = [{
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": content_text
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": image_url
+                        },
+                    },
+                ],
+            }]
+
+    chat_completion = client.chat.completions.create(
+        messages=messages,
+        model=model,
+        max_completion_tokens=64)
+    result = chat_completion.choices[0].message.content
+
+    if verbose:
+        log = "Chat completion output from "
+        if encode_image:
+            log += "base64 encoded "
+        else:
+            log += "url "
+        print(f"image: {result}")
+
     with open("output.txt", "w") as f:
-        f.write(f"Chat completion output from base64 encoded image is: {result}.")
+        f.write(result)
 
 
 def main(args) -> None:
-    run(args.image_url, args.content_text)
+    run(args.image_url, args.content_text, args.encode_image, args.verbose)
 
 if __name__ == "__main__":
     parser = FlexibleArgumentParser(
@@ -137,6 +138,9 @@ if __name__ == "__main__":
                         type=str,
                         default="What's in this image?",
                         help='Default content text for multimodal data.')
+    parser.add_argument('--encode_image', '-e',  action='store_true')
+    parser.add_argument('--verbose', '-v',  action='store_true')
+
     args = parser.parse_args()
     print(args)
     main(args)
