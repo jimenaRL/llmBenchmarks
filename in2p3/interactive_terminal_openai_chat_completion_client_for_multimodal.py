@@ -37,7 +37,7 @@ from openai import OpenAI
 
 from vllm.utils import FlexibleArgumentParser
 
-DEFAULT_IMAGE_URL = "https://fr.wikipedia.org/wiki/Mouvement_des_Gilets_jaunes#/media/Fichier:GJ_20190105_151557_(46642348481).jpg"
+DEFAULT_IMAGE_URL = "https://static.actu.fr/uploads/2018/12/09f4ec562f0f019b94f347cbcb10307e.jpg"
 
 # Modify OpenAI's API key and API base to use vLLM's API server.
 openai_api_key = "EMPTY"
@@ -116,7 +116,8 @@ def run(image_url, content_text) -> None:
 
     result = chat_completion_from_base64.choices[0].message.content
     print("Chat completion output from base64 encoded image:", result)
-
+    with open("output.txt", "w") as f:
+        f.write(f"Chat completion output from base64 encoded image is: {result}.")
 
 
 def main(args) -> None:
@@ -137,4 +138,5 @@ if __name__ == "__main__":
                         default="What's in this image?",
                         help='Default content text for multimodal data.')
     args = parser.parse_args()
+    print(args)
     main(args)
