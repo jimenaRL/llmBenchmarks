@@ -26,7 +26,7 @@ command1="vllm serve ${MODEL} --chat-template ${CHAT_TEMPLATE} --disable-log-sta
 echo "[RUNNING] ${command1}"
 eval "$command1"
 
-command2="sleep 300"
+command2="sleep 600"
 echo "[RUNNING] ${command2}"
 eval "$command2"
 
