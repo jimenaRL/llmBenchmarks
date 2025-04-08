@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# SLURM options:
+
+#SBATCH --job-name=some4dem_db_creation # Nom du jobe
+#SBATCH --output=logs/%j.log   # Standard output et error log
+
+#SBATCH --partition=gpu               # Choix de partition
+#SBATCH --gres=gpu:v100:1
+
+#SBATCH --ntasks=1                    # Exécuter une seule tâche
+#SBATCH --mem=16G                    # Mémoire en MB par défaut
+#SBATCH --time=6-23:59             # Déli max
+
+#SBATCH --mail-user=jimena.royoletelier@sciencespo.fr  # Où envoyer l'e-mail
+#SBATCH --mail-type=ALL          # Événements déclencheurs (NONE, BEGIN, END, FAIL, ALL)
+
+
+source /sps/humanum/user/jroyolet/dev/environments/vllmEnv/bin/activate
+
+MODEL="llava-hf/llava-1.5-7b-hf"
+CHAT_TEMPLATE="/sps/humanum/user/jroyolet/dev/llmBenchmarks/in2p3/template_llava.jinja"
+SCRIPT="/sps/humanum/user/jroyolet/dev/llmBenchmarks/in2p3/interactive_terminal_openai_chat_completion_client_for_multimodal.py"
+
+command1="vllm serve ${MODEL} --chat-template ${CHAT_TEMPLATE} --disable-log-stats &"
+echo "[RUNNING] ${command1}"
+eval "$command1"
+
+command2="sleep 300"
+echo "[RUNNING] ${command2}"
+eval "$command2"
+
+command3="python ${SCRIPT}"
+echo "[RUNNING] ${command3}"
+eval "$command3"
