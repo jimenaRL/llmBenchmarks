@@ -1,5 +1,6 @@
-"""An example showing how to use vLLM to serve text+image models 
-and run online serving with OpenAI client on an interactive server on IN2P3 computation center.
+"""An example showing how to use vLLM to serve text+image models
+and run online serving with OpenAI client on an interactive server
+on the IN2P3 computation center.
 
 1. Acces a GPU interactive server on IN2P3 computation platform:
 
@@ -14,6 +15,8 @@ $ nvidia-smi
 $ python3 -m venv ./environments/vllmEnv
 $ source environments/vllmEnv/bin/activate
 
+The creation must be done only one time.
+
 4. Install vLLM with CUDA 12.4
 
 $ pip install vllm==0.8.2
@@ -21,14 +24,16 @@ $ pip install vllm==0.8.2
 
 6. Launch the vllm serve with llava-1.5 model
 
-$ vllm serve llava-hf/llava-1.5-7b-hf --chat-template vllm/examples/template_llava.jinja --disable-log-stats & 
+$ vllm serve llava-hf/llava-1.5-7b-hf --chat-template template_llava.jinja --disable-log-stats &
 
-Pay attention to the "&" at the end of teh command, this allows to continue to use the same interactive terminal on IN2P3
-with the vllm server running on a separate process. 
+Pay attention to the "&" at the end of the command,
+this allows to continue to use the same interactive terminal on IN2P3
+while the vllm server is running in the background on a separate process.
 
-We also disable stats logs for a cleaner terminal. 
+We also disable stats logs for a cleaner terminal.
 
-We use the chat template for llava model accesible at the [vllm git repository](https://github.com/vllm-project/vllm/tree/main/examples).
+We use the chat template for llava model accesible at the
+[vllm git repository](https://github.com/vllm-project/vllm/tree/main/examples).
 """
 import base64
 
