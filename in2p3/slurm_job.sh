@@ -20,7 +20,7 @@ source /sps/humanum/user/jroyolet/dev/environments/vllmEnv/bin/activate
 
 MODEL="llava-hf/llava-1.5-7b-hf"
 CHAT_TEMPLATE="/sps/humanum/user/jroyolet/dev/llmBenchmarks/in2p3/template_llava.jinja"
-SCRIPT="/sps/humanum/user/jroyolet/dev/llmBenchmarks/in2p3/interactive_terminal_openai_chat_completion_client_for_multimodal.py"
+SCRIPT="/sps/humanum/user/jroyolet/dev/llmBenchmarks/in2p3/openai_chat_completion_client_for_multimodal.py -v"
 
 command1="vllm serve ${MODEL} --chat-template ${CHAT_TEMPLATE} --disable-log-stats &"
 echo "[RUNNING] ${command1}"
