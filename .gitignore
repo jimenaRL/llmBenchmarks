@@ -2,3 +2,4 @@
 *.txt
 .python-version
 outs
+vllm
