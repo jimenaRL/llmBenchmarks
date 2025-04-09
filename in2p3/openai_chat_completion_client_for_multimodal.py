@@ -35,28 +35,30 @@ We also disable stats logs for a cleaner terminal.
 We use the chat template for llava model accesible at the
 [vllm git repository](https://github.com/vllm-project/vllm/tree/main/examples).
 """
-import base64
 
-import requests
-from openai import OpenAI
+import csv
+# import base64
 
-from vllm.utils import FlexibleArgumentParser
+# import requests
+# from openai import OpenAI
 
-DEFAULT_IMAGE_URL = "https://static.actu.fr/uploads/2018/12/09f4ec562f0f019b94f347cbcb10307e.jpg"
+from argparse import ArgumentParser
 
-# Modify OpenAI's API key and API base to use vLLM's API server.
-openai_api_key = "EMPTY"
-openai_api_base = "http://localhost:8000/v1"
+DEFAULT_IMAGE_URL = "https://pbs.twimg.com/profile_images/1570498434532089858/VeyQlH3U_400x400.jpg"
+DEFAULT_CONTENT_TEXT = "This is Chimamanda Ngozi Adichie’s official Twitter."
 
-client = OpenAI(
-    # defaults to os.environ.get("OPENAI_API_KEY")
-    api_key=openai_api_key,
-    base_url=openai_api_base,
-)
+# # Modify OpenAI's API key and API base to use vLLM's API server.
+# OPENAI_API_KEY = "EMPTY"
+# OPENAI_API_BASE = "http://localhost:8000/v1"
 
-models = client.models.list()
-model = models.data[0].id
+# client = OpenAI(
+#     # defaults to os.environ.get("OPENAI_API_KEY")
+#     api_key=OPENAI_API_KEY,
+#     base_url=OPENAI_API_BASE,
+# )
 
+# models = client.models.list()
+# model = models.data[0].id
 
 def encode_base64_content_from_url(content_url: str) -> str:
     """Encode a content retrieved from a remote url to base64 format."""
@@ -69,7 +71,7 @@ def encode_base64_content_from_url(content_url: str) -> str:
 
     return result
 
-def run(image_url, content_text, encode_image, verbose) -> None:
+def run(id, image_url, content_text, encode_image, verbose) -> None:
 
     # Use base64 encoded image in the payload
     if encode_image:
@@ -122,27 +124,37 @@ def run(image_url, content_text, encode_image, verbose) -> None:
             log += "url"
         print(f"{log} image: {result}")
 
-    with open("output.txt", "w") as f:
+    with open(f"{id}.txt", "w") as f:
         f.write(result)
 
 
 def main(args) -> None:
-    run(args.image_url, args.content_text, args.encode_image, args.verbose)
+    if args.csv_file is None:
+        run("response", args.image_url, args.content_text, args.encode_image, args.verbose)
+    else:
+        with open(args.csv_file, mode ='r') as file:
+          csvFile = csv.DictReader(file)
+          for i, d in enumerate(csvFile):
+                run(i, d['image_url'], d['content_text'], args.encode_image, args.verbose)
 
 if __name__ == "__main__":
-    parser = FlexibleArgumentParser(
+    parser = ArgumentParser(
         description='Demo on using OpenAI client for online serving with '
         'text+image language models served with vLLM.')
-    parser.add_argument('--image-url',
+    parser.add_argument('--image_url',
                         '-i',
                         type=str,
                         default=DEFAULT_IMAGE_URL,
                         help='Default image url for multimodal data.')
-    parser.add_argument('--content-text',
+    parser.add_argument('--content_text',
                         '-t',
                         type=str,
-                        default="What's in this image?",
-                        help='Default content text for multimodal data.')
+                        default=DEFAULT_CONTENT_TEXT,
+                        help='Content text for multimodal data.')
+    parser.add_argument('--csv_file',
+                        '-f',
+                        type=str,
+                        help='CSV file with image_url and content_text columns.')
     parser.add_argument('--encode_image', '-e',  action='store_true')
     parser.add_argument('--verbose', '-v',  action='store_true')
 
