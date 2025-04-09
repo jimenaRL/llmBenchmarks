@@ -46,6 +46,9 @@ from argparse import ArgumentParser
 
 DEFAULT_IMAGE_URL = "https://pbs.twimg.com/profile_images/1570498434532089858/VeyQlH3U_400x400.jpg"
 DEFAULT_CONTENT_TEXT = "This is Chimamanda Ngozi Adichie’s official Twitter."
+DEFAULT_PROMPT = """
+    Please state if the twitter account to which the followings bio and picture belongs is a human person ot not.
+    Be concise ans anwers only with yes, no ot undeterminate."""
 
 # # Modify OpenAI's API key and API base to use vLLM's API server.
 # OPENAI_API_KEY = "EMPTY"
@@ -102,6 +105,10 @@ def run(id, image_url, content_text, encode_image, verbose) -> None:
                         "text": content_text
                     },
                     {
+                        "type": "text",
+                        "text": content_text
+                    },
+                    {
                         "type": "image_url",
                         "image_url": {
                             "url": image_url
@@ -130,12 +137,22 @@ def run(id, image_url, content_text, encode_image, verbose) -> None:
 
 def main(args) -> None:
     if args.csv_file is None:
-        run("response", args.image_url, args.content_text, args.encode_image, args.verbose)
+        run("response",
+            args.prompt,
+            args.image_url,
+            args.content_text,
+            args.encode_image,
+            args.verbose)
     else:
         with open(args.csv_file, mode ='r') as file:
           csvFile = csv.DictReader(file)
           for i, d in enumerate(csvFile):
-                run(i, d['image_url'], d['content_text'], args.encode_image, args.verbose)
+                run(i,
+                    args.prompt,
+                    d['image_url'],
+                    d['content_text'],
+                    args.encode_image,
+                    args.verbose)
 
 if __name__ == "__main__":
     parser = ArgumentParser(
@@ -145,7 +162,12 @@ if __name__ == "__main__":
                         '-i',
                         type=str,
                         default=DEFAULT_IMAGE_URL,
-                        help='Default image url for multimodal data.')
+                        help='Image url for multimodal data.')
+    parser.add_argument('--prompt',
+                        '-p',
+                        type=str,
+                        default=DEFAULT_PROMPT,
+                        help='The prompt.')
     parser.add_argument('--content_text',
                         '-t',
                         type=str,
