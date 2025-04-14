@@ -15,6 +15,10 @@
 #SBATCH --mail-user=myemail@notgmail.fr  # Où envoyer l'e-mail
 #SBATCH --mail-type=ALL          # Événements déclencheurs (NONE, BEGIN, END, FAIL, ALL)
 
+# Example script for running and query a vllm server on a slurm job.
+# Before running the job you must launch un interactive job a install vllm on a python virtual enviroment
+# as explained on the points 1-4 here:
+# https://github.com/jimenaRL/llmBenchmarks/blob/main/in2p3/openai_chat_completion_client_for_multimodal.py
 
 source /sps/humanum/user/jroyolet/dev/environments/vllmEnv/bin/activate
 
