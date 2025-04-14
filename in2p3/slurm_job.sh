@@ -2,7 +2,7 @@
 
 # SLURM options:
 
-#SBATCH --job-name=some4dem_db_creation # Nom du jobe
+#SBATCH --job-name=vllm_server_llava_test # Nom du jobe
 #SBATCH --output=logs/%j.log   # Standard output et error log
 
 #SBATCH --partition=gpu               # Choix de partition
@@ -12,7 +12,7 @@
 #SBATCH --mem=16G                    # Mémoire en MB par défaut
 #SBATCH --time=6-23:59             # Déli max
 
-#SBATCH --mail-user=jimena.royoletelier@sciencespo.fr  # Où envoyer l'e-mail
+#SBATCH --mail-user=myemail@notgmail.fr  # Où envoyer l'e-mail
 #SBATCH --mail-type=ALL          # Événements déclencheurs (NONE, BEGIN, END, FAIL, ALL)
 
 
