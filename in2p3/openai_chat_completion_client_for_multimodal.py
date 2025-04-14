@@ -47,7 +47,7 @@ from argparse import ArgumentParser
 DEFAULT_IMAGE_URL = "https://pbs.twimg.com/profile_images/1570498434532089858/VeyQlH3U_400x400.jpg"
 DEFAULT_CONTENT_TEXT = "This is Chimamanda Ngozi Adichie’s official Twitter."
 DEFAULT_PROMPT = """
-    Please state if the twitter account to which the followings bio and picture belongs is a human person ot not.
+    Please state if the twitter account to which the followings bio and picture belongs is a human person or not.
     Be concise ans anwers only with yes, no ot undeterminate."""
 
 # Modify OpenAI's API key and API base to use vLLM's API server.
