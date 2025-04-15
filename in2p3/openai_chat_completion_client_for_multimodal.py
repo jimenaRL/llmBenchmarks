@@ -15,12 +15,12 @@ $ nvidia-smi
 $ python3 -m venv ./environments/vllmEnv
 $ source environments/vllmEnv/bin/activate
 
-The creation must be done only one time.
+The creation must be done only one time but the activattion
+must be donne at each conection to the interactive termilal.
 
-4. Install vLLM with CUDA 12.4
+4. Install vLLM (with support for CUDA 12.4)
 
 $ pip install vllm==0.8.2
-
 
 6. Launch the vllm serve with llava-1.5 model
 
@@ -34,6 +34,14 @@ We also disable stats logs for a cleaner terminal.
 
 We use the chat template for llava model accesible at the
 [vllm git repository](https://github.com/vllm-project/vllm/tree/main/examples).
+
+7. Wait a around 5-10 minutes untill de server is ready and stable and then lauch 
+this python script:
+
+$ python openai_chat_completion_client_for_multimodal.py -v \
+--prompt="Please state if the twitter account to which the followings bio and picture belongs to a human person or not. Be concise ans anwers only with yes, no or undeterminate." \
+--content_text="Président de la République française." \
+--image_url=https://pbs.twimg.com/profile_images/1550535324501164032/0lTW_4tj_400x400.jpg
 """
 
 import csv
@@ -47,8 +55,8 @@ from argparse import ArgumentParser
 DEFAULT_IMAGE_URL = "https://pbs.twimg.com/profile_images/1570498434532089858/VeyQlH3U_400x400.jpg"
 DEFAULT_CONTENT_TEXT = "This is Chimamanda Ngozi Adichie’s official Twitter."
 DEFAULT_PROMPT = """
-    Please state if the twitter account to which the followings bio and picture belongs is a human person or not.
-    Be concise ans anwers only with yes, no ot undeterminate."""
+    Please state if the twitter account to which the followings bio and picture belongs to a human person or not.
+    Be concise ans anwers only with yes, no or undeterminate."""
 
 # Modify OpenAI's API key and API base to use vLLM's API server.
 OPENAI_API_KEY = "EMPTY"
