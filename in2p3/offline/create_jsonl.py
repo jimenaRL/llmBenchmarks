@@ -25,9 +25,9 @@ template_dict = {
 }
 
 prompt = "Please indicate whether the Twitter account "
-prompt += "(which has the following bio and photo"
+prompt += "(which has the following bio and photo)"
 prompt += "belongs to a human person or not."
-prompt += "Be concise ans anwers only with yes, no or undeterminate."
+prompt += "Be concise ans anwers only with yes, no or ambigous."
 
 # load data
 with open("data.csv", 'r') as f:
