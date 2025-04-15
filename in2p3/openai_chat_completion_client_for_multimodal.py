@@ -1,8 +1,8 @@
 """An example showing how to use vLLM to serve text+image models
-and run online serving with OpenAI client on an interactive server
+and run online serving with OpenAI client on a single interactive terminal
 on the IN2P3 computation center.
 
-1. Acces a GPU interactive server on IN2P3 computation platform:
+1. Acces a GPU interactive terminal on IN2P3 computation platform:
 
 $ srun -p gpu_interactive -t 0-03:00 --mem 16G --gres=gpu:h100:1 --pty bash -i
 
@@ -16,11 +16,13 @@ $ python3 -m venv ./environments/vllmEnv
 $ source environments/vllmEnv/bin/activate
 
 The creation must be done only one time but the activattion
-must be donne at each conection to the interactive termilal.
+must be donne at each conection to the interactive terminal.
 
-4. Install vLLM (with support for CUDA 12.4)
+4. Install vLLM with pip 
 
 $ pip install vllm==0.8.2
+
+The 0.8.2 version has support for the CUDA version (12.4) installed.
 
 6. Launch the vllm server with llava-1.5 model
 
@@ -30,16 +32,17 @@ Pay attention to the "&" at the end of the command,
 this allows to continue to use the same interactive terminal on IN2P3
 while the vllm server is running in the background on a separate process.
 
-We also disable stats logs for a cleaner terminal.
+Since the vllm server will be running on the same terminal that the python script
+consuming it, we disable stats logs to have a cleaner terminal.
 
-Note that we use the chat template for llava model accesible at the
+Note also that we use the chat template for llava model accesible at the
 [vllm git repository](https://github.com/vllm-project/vllm/tree/main/examples).
 
 7. Wait a around 5-10 minutes untill de server is ready and stable and then lauch 
 this python script:
 
 $ python openai_chat_completion_client_for_multimodal.py -v \
---prompt="Please state if the twitter account to which the followings bio and picture belongs to a human person or not. Be concise ans anwers only with yes, no or undeterminate." \
+--prompt="Please indicate whether the Twitter account (which has the following bio and photo) belongs to a human person or not. Be concise ans anwers only with yes, no or undeterminate." \
 --content_text="Président de la République française." \
 --image_url=https://pbs.twimg.com/profile_images/1550535324501164032/0lTW_4tj_400x400.jpg
 """
