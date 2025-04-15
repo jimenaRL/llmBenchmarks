@@ -16,7 +16,7 @@ $ python3 -m venv ./environments/vllmEnv
 $ source environments/vllmEnv/bin/activate
 
 The creation must be done only one time but the activattion
-must be donne at each conection to the interactive terminal.
+must be donne at each connection to the interactive terminal.
 
 4. Install vLLM with pip 
 
