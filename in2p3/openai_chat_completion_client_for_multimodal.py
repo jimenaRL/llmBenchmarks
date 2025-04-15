@@ -44,7 +44,16 @@ $ python openai_chat_completion_client_for_multimodal.py -v \
 --prompt="Please indicate whether the Twitter account (which has the following bio and photo) belongs to a human person or not. Be concise ans anwers only with yes, no or undeterminate." \
 --content_text="Président de la République française." \
 --image_url=https://pbs.twimg.com/profile_images/1550535324501164032/0lTW_4tj_400x400.jpg
+
+When the vllm server is ready, you should see the following message in the interactive terminal
+
+INFO:     Started server process [PID]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+
+Where PID is the process on which teh server is running.
 """
+
 
 import csv
 import base64
