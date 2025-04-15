@@ -22,7 +22,7 @@ must be donne at each conection to the interactive termilal.
 
 $ pip install vllm==0.8.2
 
-6. Launch the vllm serve with llava-1.5 model
+6. Launch the vllm server with llava-1.5 model
 
 $ vllm serve llava-hf/llava-1.5-7b-hf --chat-template template_llava.jinja --disable-log-stats &
 
