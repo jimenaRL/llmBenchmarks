@@ -38,15 +38,15 @@ data = data[1:]
 
 # remove breaklines from data
 for d in data:
-    d[1] = d[1].replace("\n", " ")
+    d[2] = d[2].replace("\n", " ")
 
 # customize lines with input data
 lines = [
     Template(json.dumps(template_dict)).substitute(
         prompt=prompt,
         id=d[0],
-        image_url=d[0],
-        content_text=d[1])
+        image_url=d[1],
+        content_text=d[2])
     for d in data
 ]
 
