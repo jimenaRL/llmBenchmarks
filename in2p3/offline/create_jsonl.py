@@ -36,6 +36,10 @@ with open("data.csv", 'r') as f:
 headers = data[0]
 data = data[1:]
 
+# remove breaklines from data
+for d in data:
+    d[1] = d[1].replace("\n", " ")
+
 # customize lines with input data
 lines = [
     Template(json.dumps(template_dict)).substitute(
@@ -47,7 +51,7 @@ lines = [
 # checks lines are ok
 for line in lines:
     try:
-        json.loads(line, strict=False)
+        json.loads(line, strict=True)
     except Exception as e:
         print(f"Unnable to load line as json dict: {line}")
         print(e)
