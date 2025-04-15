@@ -32,7 +32,7 @@ while the vllm server is running in the background on a separate process.
 
 We also disable stats logs for a cleaner terminal.
 
-We use the chat template for llava model accesible at the
+Note that we use the chat template for llava model accesible at the
 [vllm git repository](https://github.com/vllm-project/vllm/tree/main/examples).
 
 7. Wait a around 5-10 minutes untill de server is ready and stable and then lauch 
