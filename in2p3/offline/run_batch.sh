@@ -1,0 +1,1 @@
+python python /sps/humanum/user/jroyolet/dev/vllm/vllm/entrypoints/openai/run_batch.py -i test_for_llava.jsonl -o llava_results.jsonl --model llava-hf/llava-1.5-7b-hf -i test_for_llava.jsonl -o llava_results.jsonl --model llava-hf/llava-1.5-7b-hf
