@@ -3,7 +3,7 @@ import json
 from string import Template
 
 template_dict = {
-    "custom_id": "request-1",
+    "custom_id": "request-${id}",
     "method": "POST", "url": "/v1/chat/completions",
     "body": {
       "model": "llava-hf/llava-1.5-7b-hf",
@@ -44,8 +44,10 @@ for d in data:
 lines = [
     Template(json.dumps(template_dict)).substitute(
         prompt=prompt,
-        content_text=d[1],
-        image_url=d[0]) for d in data
+        id=d[0],
+        image_url=d[0],
+        content_text=d[1])
+    for d in data
 ]
 
 # checks lines are ok
