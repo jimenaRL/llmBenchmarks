@@ -29,17 +29,16 @@ The 0.8.2 version has support for the CUDA version (12.4) installed.
 $ vllm serve llava-hf/llava-1.5-7b-hf --chat-template template_llava.jinja --disable-log-stats &
 
 Pay attention to the "&" at the end of the command,
-this allows to continue to use the same interactive terminal on IN2P3
-while the vllm server is running in the background on a separate process.
+this allows you to continue using the same interactive terminal on IN2P3
+while the vLLM server is running in the background on a separate process.
 
-Since the vllm server will be running on the same terminal that the python script
-consuming it, we disable stats logs to have a cleaner terminal.
+Since the vllm server will run on the same terminal as the python script consuming it,
+we disable the statistics logs to have a cleaner terminal.
 
 Note also that we use the chat template for llava model accesible at the
 [vllm git repository](https://github.com/vllm-project/vllm/tree/main/examples).
 
-7. Wait a around 5-10 minutes untill de server is ready and stable and then lauch 
-this python script:
+7. Wait for about 5-10 minutes until the server is ready and stable, and then launch this python script:
 
 $ python openai_chat_completion_client_for_multimodal.py -v \
 --prompt="Please indicate whether the Twitter account (which has the following bio and photo) belongs to a human person or not. Be concise ans anwers only with yes, no or undeterminate." \
