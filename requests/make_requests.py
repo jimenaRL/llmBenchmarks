@@ -6,8 +6,8 @@ from argparse import ArgumentParser
 
 ap = ArgumentParser()
 ap.add_argument('--request_template', type=str, required=False, default="patternRequest.json")
-ap.add_argument('--bios_path', type=str, required=False, default="chargeLoadTest.csv")
-ap.add_argument('--output_file', type=str, required=False, default="batchRequest.jsonl")
+ap.add_argument('--bios_path', type=str, required=False, default="chargeLoadTest20k.csv")
+ap.add_argument('--output_file', type=str, required=False, default="batchRequest20k.jsonl")
 args = ap.parse_args()
 requestTemplate = args.request_template
 biosPath = args.bios_path
@@ -26,16 +26,12 @@ with open(biosPath, 'r') as csvfile:
     bios = [c[0] for c in reader]
 
 # Create a batch of request in the form of a jsonl file
-# by substituting each bio into the request pattern
-requests =  [Template(pattern).substitute(id=i, userbio=json.dumps(b)) for i, b in enumerate(bios)]
+# by substituting each bio into the request pattern.
+# We use use json.dumps to scape all possible conflictual characters
+requests =  [Template(pattern).substitute(id=i, userbio=json.dumps(b)[1:-1]) for i, b in enumerate(bios)]
 dumped_requests = map(json.dumps, requests)
 with open(outputJsonl, "w") as f:
-    # f.writelines('\n'.join(dumped_requests))
     f.writelines('\n'.join(requests))
-
-# # Validate the created jsonl file
-# with open(outputJsonl, "r") as f:
-#    reloaded_requests = list(map(json.loads, f.readlines()))
 
 assert len(bios) == len(requests)
 
