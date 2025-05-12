@@ -23,19 +23,19 @@ with open(requestTemplate, 'r') as f:
 with open(biosPath, 'r') as csvfile:
     reader = csv.reader(csvfile)
     headers = next(reader)
-    bios = [c[0] for c in reader]
+    ids_bios = [r for r in reader]
 
 # Create a batch of request in the form of a jsonl file
 # by substituting each bio and id into the request pattern.
 # We use use json.dumps to scape all possible conflictual characters
 requests =  [
-    Template(pattern).substitute(id=i, userbio=json.dumps(b)[1:-1])
-    for i, b in enumerate(bios)
+    Template(pattern).substitute(id=ib[0], userbio=json.dumps(ib[1])[1:-1])
+    for ib in ids_bios
 ]
 dumped_requests = map(json.dumps, requests)
 with open(outputJsonl, "w") as f:
     f.writelines('\n'.join(requests))
 
-assert len(bios) == len(requests)
+assert len(ids_bios) == len(requests)
 
 print(f"Jsonl output file wrote to {outputJsonl} with {len(requests)} lines.")
