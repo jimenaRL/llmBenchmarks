@@ -26,9 +26,12 @@ with open(biosPath, 'r') as csvfile:
     bios = [c[0] for c in reader]
 
 # Create a batch of request in the form of a jsonl file
-# by substituting each bio into the request pattern.
+# by substituting each bio and id into the request pattern.
 # We use use json.dumps to scape all possible conflictual characters
-requests =  [Template(pattern).substitute(id=i, userbio=json.dumps(b)[1:-1]) for i, b in enumerate(bios)]
+requests =  [
+    Template(pattern).substitute(id=i, userbio=json.dumps(b)[1:-1])
+    for i, b in enumerate(bios)
+]
 dumped_requests = map(json.dumps, requests)
 with open(outputJsonl, "w") as f:
     f.writelines('\n'.join(requests))
