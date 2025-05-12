@@ -32,7 +32,6 @@ requests =  [
     Template(pattern).substitute(id=ib[0], userbio=json.dumps(ib[1])[1:-1])
     for ib in ids_bios
 ]
-dumped_requests = map(json.dumps, requests)
 with open(outputJsonl, "w") as f:
     f.writelines('\n'.join(requests))
 
