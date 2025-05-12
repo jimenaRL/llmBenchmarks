@@ -5,9 +5,9 @@ from string import Template
 from argparse import ArgumentParser
 
 ap = ArgumentParser()
-ap.add_argument('--request_template', type=str, required=False, default="patternRequest.json")
-ap.add_argument('--bios_path', type=str, required=False, default="chargeLoadTest20k.csv")
-ap.add_argument('--output_file', type=str, required=False, default="batchRequest20k.jsonl")
+ap.add_argument('--request_template', type=str, required=False, default="patternRequest_llava.json")
+ap.add_argument('--bios_path', type=str, required=False, default="biosExample.csv")
+ap.add_argument('--output_file', type=str, required=False, default="batchRequestExample.jsonl")
 args = ap.parse_args()
 requestTemplate = args.request_template
 biosPath = args.bios_path
