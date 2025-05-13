@@ -26,16 +26,15 @@ module load python/3.12.7
 conda init
 conda activate vllm
 
+# Change directory
+cd /linkhome/rech/gensoj01/umu89ib/.conda/envs/vllm/lib/python3.12/site-packages/vllm/entrypoints/openai
+
 # Get args
 INPUT=$1
 OUTPUT=$2
 MODEL=$1
 
 # Run command
-cmd = f"
-    python /linkhome/rech/gensoj01/umu89ib/.conda/envs/vllm/lib/python3.12/site-packages/vllm/entrypoints/openai/run_batch.py \
-    -i ${INPUT} \
-    -o ${OUTPUT} \
-    --model ${MODEL}"
+cmd="python run_batch.py -i ${INPUT} -o ${OUTPUT} --model ${MODEL} --gpu-memory-utilization=0.9 --max_model_len=21500 --dtype=half"
 echo "[RUNNING] ${cmd}"
 eval "$cmd"
