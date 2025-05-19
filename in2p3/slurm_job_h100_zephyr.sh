@@ -28,7 +28,8 @@ cmd="python /sps/humanum/user/jroyolet/environments/vllm0.8.4/lib64/python3.9/si
     --model=HuggingFaceH4/zephyr-7b-beta \
     --gpu-memory-utilization=0.9 \
     --max_model_len=21500 \
-    --dtype=half"
+    --dtype=half \
+    --disable-log-stats"
 
 echo "[RUNNING] ${cmd}"
 eval "$cmd"
