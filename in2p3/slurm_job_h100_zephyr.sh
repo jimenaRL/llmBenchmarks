@@ -29,7 +29,8 @@ cmd="python /sps/humanum/user/jroyolet/environments/vllm0.8.4/lib64/python3.9/si
     --gpu-memory-utilization=0.9 \
     --max_model_len=21500 \
     --dtype=half \
-    --disable-log-stats"
+    --guided-decoding-backend=xgrammar \
+    --disable-log-stats \"
 
 echo "[RUNNING] ${cmd}"
 eval "$cmd"
