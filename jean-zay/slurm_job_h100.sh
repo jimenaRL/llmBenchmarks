@@ -38,6 +38,15 @@ export HUGGINGFACE_HUB_CACHE=/lustre/fswork/projects/rech/nmf/umu89ib/.cache/hug
 nvidia-smi
 
 # Run command
-cmd="python /linkhome/rech/gensoj01/umu89ib/.conda/envs/vllm/lib/python3.12/site-packages/vllm/entrypoints/openai/run_batch.py -i ${INPUT} -o ${OUTPUT} --model=HuggingFaceH4/zephyr-7b-beta --gpu-memory-utilization=0.9 --max_model_len=21500 --dtype=half"
+cmd="python /linkhome/rech/gensoj01/umu89ib/.conda/envs/vllm/lib/python3.12/site-packages/vllm/entrypoints/openai/run_batch.py \
+    -i ${INPUT} \
+    -o ${OUTPUT} \
+    --model=HuggingFaceH4/zephyr-7b-beta \
+    --gpu-memory-utilization=0.9 \
+    --max_model_len=21500 \
+    --dtype=half \
+    --guided-decoding-backend=xgrammar \
+    --disable-log-stats"
+
 echo "[RUNNING] ${cmd}"
 eval "$cmd"

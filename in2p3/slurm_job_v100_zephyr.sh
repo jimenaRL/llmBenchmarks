@@ -2,11 +2,11 @@
 
 # SLURM options:
 
-#SBATCH --job-name=vllmZephyrH100 # Nom du job
+#SBATCH --job-name=vllmZephyrV100 # Nom du job
 #SBATCH --output=logs/%j.log   # Standard output et error log
 
 #SBATCH --partition=gpu               # Choix de partition
-#SBATCH --gres=gpu:h100:1
+#SBATCH --gres=gpu:v100:1
 
 #SBATCH --ntasks=1                    # Exécuter une seule tâche
 #SBATCH --mem=16G                    # Mémoire en MB par défaut
