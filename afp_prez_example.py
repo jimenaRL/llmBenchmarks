@@ -1,15 +1,13 @@
 bios = [
-    "C'est la patience",
-    "photo, musique, vin, moto, voyages",
-    "Rieur",
-    "The world is divided into two categories, those who have a level of conscience developed and the others 🇷 #TeamPatriote #JambonBeurre #Macrondehors",
-    "Syndicat National de l'Enseignement Technique Agricole Public. Membre de la Fédération Syndicale Unitaire. #FSU #EnseignementAgricole",
+    "C'est la virtud",
+    "photo, cinéma, bière, moto, voyages",
+    "Rigoleur",
+    "The world is divided into two categories, those with a developed level of consciousness and those who #TeamPatrie #BeurreJambon #MacronDegage🇷,"
     "Enseignante, féministe, et autres gros mots du genre en -iste.",
-    "« Elle est à vous, votre culture, et je vous l'ai composée avec amour, comme un bouquet »",
-    "Ecole Boule, disque Vogue, Publicis Conseil . Sous le nom d'Olivier Sorel Produit et interprète un spectacle pour faire vivre l'oeuvre de Gilbert Bécaud",
+    "« C'est la vôtre, votre culture, et je l'ai composée pour vous avec amour, comme un bouquet »",
     "MP, Chair of the Foreign Affairs Committee of @Jekaba11 ||| Saeimas deputāts, Ārlietu komisijas priekšsēdētājs, @VL_TBLNNK valdes loceklis, zemessargs",
-    "Prône l’union sacré contre les Wokes",
-    "Plus rien ne m’étonne jusqu’ici tout va bien",
+    "Plaider pour l'unité sacrée contre le woke",
+    "Rien ne me surprend jusqu'à présent, tout va bien",
 ]
 
 
