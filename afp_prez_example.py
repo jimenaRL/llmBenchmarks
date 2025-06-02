@@ -1,3 +1,9 @@
+"""
+Must launch vllm server before with:
+
+vllm serve "HuggingFaceH4/zephyr-7b-beta"
+"""
+
 bios = [
     "C'est la virtud",
     "photo, cinéma, bière, moto, voyages",
