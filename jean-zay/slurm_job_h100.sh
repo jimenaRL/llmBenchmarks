@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH --job-name=vllmZephyrH100 # Nom du jobe
-#SBATCH --output=logs/%j.log   # name of output file
-#SBATCH --error=errors/%j.error  # name of error file (here, common with the output file)
+#SBATCH --output=/lustre/fswork/projects/rech/nmf/umu89ib/logs/%j.log   # name of output file
+#SBATCH --error=/lustre/fswork/projects/rech/nmf/umu89ib/errors/%j.error  # name of error file (here, common with the output file)
 
 #SBATCH -C h100                # Choix de partition (here gpu_p5 partition 80GB A100 GPU)
 #SBATCH --gres=gpu:1                 # number of GPUs per node (max 8 with gpu_p2, gpu_p5)
