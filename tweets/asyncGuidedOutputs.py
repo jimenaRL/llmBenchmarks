@@ -115,13 +115,14 @@ async def run_all(instructions):
 start = time.time()
 results = asyncio.run(run_all(instructions[language][experiment]))
 end = time.time()
+print(f"Took {end - start} seconds.")
 
+headers = ["id", f"choice_{language}_{experiment}"]
 with open(results_file, 'w') as f:
     writer =  csv.writer(f)
     writer.writerow(headers)
-    writer.writerows(zip(tweets, results))
+    writer.writerows(enumerate(results))
 print(f"LLM answers (={len(results)}) saved to {results_file}.")
-print(f"Took {end - start} seconds.")
 
 
 # 7/ Kill vllm server
