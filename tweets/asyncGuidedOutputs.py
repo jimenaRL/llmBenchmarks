@@ -101,11 +101,11 @@ label_extra_body = {
     "repetition_penalty": 1.2,
     }
 
-async def run_all(instructions, messages):
+async def run_all(instructions):
     # Asynchronously call the function for each prompt
     tasks = [
         doCompletetion(model, messages, label_extra_body)
-        async for messages in asyncMessageIterator(instructions)
+        async for messages in asyncMessageIterator(instructions, language)
     ]
     # Gather and run the tasks concurrently
     results = await asyncio.gather(*tasks)
