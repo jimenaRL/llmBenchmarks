@@ -42,23 +42,9 @@ instructions = {
 }
 
 
-with open('Giants.csv', mode ='r')as file:
-  csvFile = csv.reader(file)
-  for lines in csvFile:
-        print(lines)
-
-
 with open(tweets_file, newline='') as f:
     csvFile = csv.DictReader(f)
     tweets = [l for l in csvFile]
-=======
-instructions = {
-    1: "Tu vas classifier des messages des médias sociaux selon s’ils expriment l’intention de voter pour un candidat ou s’ils appellent à voter pour un candidat à l’élection présidentielle de 2022 en France. Dis moi si le message suivant exprime l'intention de voter pour ou appelle à voter pour Macron, Mélenchon ou Le Pen, en répondant uniquement par le nom de famille du candidat, ou par “Aucun”, si le message ne montre soutien pour aucun de ces trois candidats. Voici le message: ${tweet}",
-    2 : "Tu vas classifier des messages des médias sociaux selon s’ils expriment du soutien pour un candidat à l’élection présidentielle de 2022 en France. Dis moi si le message suivant exprime du soutien pour Macron, Mélenchon ou Le Pen, en répondant uniquement par le nom de famille du candidat, ou par le mot “Autre”, si le message n’exprime pas d’intention vote ou appelleà voter pour l’un de ces trois candidats. Voici le message: ${tweet}"
-}
-with open(tweets_file, newline='') as f:
-    tweets = [r[:-1] for r in f.readlines()][1:]
->>>>>>> 902829cf5cd96b217493cb4d463d7e2d8ba8b388
 print(f"Load {len(tweets)} tweets.")
 
 # 0/ Launch vllm server
