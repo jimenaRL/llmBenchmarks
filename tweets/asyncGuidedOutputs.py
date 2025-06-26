@@ -1,29 +1,54 @@
+import os
 import csv
+import asyncio
+from time import sleep
+from openai import OpenAI
+from string import Template
+from argparse import ArgumentParser
 
-guided_choice = [
-    "Macron",
-    "Mélenchon",
-    "Le Pen",
-    "Aucun"
-]
+ap = ArgumentParser(prog="Create python commands or slurm jobs for openia async requests.")
+ap.add_argument('--tweets_file', required=True, type=str)
+ap.add_argument('--language', required=True, type=str, choices=["english", "french"])
+ap.add_argument('--experiment', required=True, type=int, choices=[1, 2])
+args = ap.parse_args()
+tweets_file = args.tweets_file
+language = args.language
+experiment = args.experiment
 
-instructions_1 = """Tu vas classifier des messages des médias sociaux selon s’ils expriment l’intention de voter pour un candidat
-ou s’ils appellent à voter pour un candidat à l’élection présidentielle de 2022 en France.
-Dis moi si le message suivant exprime l'intention de voter pour ou appelle à voter pour Macron, Mélenchon ou Le Pen,
-en répondant uniquement par le nom de famille du candidat, ou par “Aucun”, si le message ne montre soutien pour aucun de ces trois candidats.
-Voici le message: ${tweet}
-"""
+results_file = f"results_promts_{language}_{experiment}_{tweets_file.split('.csv')[0]}.csv"
 
-instructions_2 = """Tu vas classifier des messages des médias sociaux selon s’ils expriment du soutien pour un candidat
-à l’élection présidentielle de 2022 en France.
-Dis moi si le message suivant exprime du soutien pour Macron, Mélenchon ou Le Pen, en répondant uniquement
-par le nom de famille du candidat, ou par le mot “Autre”, si le message n’exprime pas d’intention vote ou appelle
-à voter pour l’un de ces trois candidats.
-Voici le message: ${tweet}
-"""
+guided_choice = {
+    "french": {
+        1: ["Macron", "Mélenchon", "Le Pen", "Aucun"],
+        2: ["Macron", "Mélenchon", "Le Pen", "Autre"],
+    },
+    "english": {
+        1: ["Macron", "Mélenchon", "Le Pen", "None"],
+        2: ["Macron", "Mélenchon", "Le Pen", "Other"],
+    }
+}
 
-with open('sample_xan_seed_761.csv', newline='') as f:
-    tweets = [r[:-1] for r in f.readlines()][1:]
+instructions = {
+    "french": {
+        1: "Tu vas classifier des messages des médias sociaux selon s’ils expriment l’intention de voter pour un candidat ou s’ils appellent à voter pour un candidat à l’élection présidentielle de 2022 en France. Dis moi si le message suivant exprime l'intention de voter pour ou appelle à voter pour Macron, Mélenchon ou Le Pen, en répondant uniquement par le nom de famille du candidat, ou par “Aucun”, si le message ne montre soutien pour aucun de ces trois candidats. Voici le message: ${tweet}",
+        2 : "Tu vas classifier des messages des médias sociaux selon s’ils expriment du soutien pour un candidat à l’élection présidentielle de 2022 en France. Dis moi si le message suivant exprime du soutien pour Macron, Mélenchon ou Le Pen, en répondant uniquement par le nom de famille du candidat, ou par le mot “Autre”, si le message n’exprime pas d’intention vote ou appelleà voter pour l’un de ces trois candidats. Voici le message: ${tweet}"
+    },
+    "english": {
+        1: "You'll classify social media posts based on whether they express the intention to vote for a candidate or if they call for a vote for a candidate in the 2022 presidential election in France. Tell me if the following message expresses the intention to vote for or calls for a vote for Macron, Mélenchon or Le Pen, replying only with the candidate's last name, or with 'None', if the message does not show support for any of these three candidates. Here is the message:: ${tweet}",
+        2: " You'll classify social media posts based on whether they express support for a candidate in the 2022 presidential election in France. Tell me if the following message expresses support for Macron, Mélenchon or Le Pen, by replying only with the candidate's last name, or with the word 'Other', if the message does not express an intention to vote or calls for a vote for one of these three candidates. Here is the message: ${tweet}"
+    },
+}
+
+
+with open('Giants.csv', mode ='r')as file:
+  csvFile = csv.reader(file)
+  for lines in csvFile:
+        print(lines)
+
+
+with open(tweets_file, newline='') as f:
+    csvFile = csv.DictReader(f)
+    tweets = [l for l in csvFile]
 print(f"Load {len(tweets)} tweets.")
 
 # 0/ Launch vllm server
@@ -57,7 +82,7 @@ async def doCompletetion(model, messages, extra_body):
     content = completion.choices[0].message.content
     return content
 
-async def asyncMessageIterator(instructions):
+async def asyncMessageIterator(instructions, language):
     for tweet in tweets:
         yield [
                     {
@@ -66,13 +91,12 @@ async def asyncMessageIterator(instructions):
                     },
                     {
                         "role": "user",
-                        "content":  Template(instructions).substitute(tweet=tweet)
+                        "content":  Template(instructions).substitute(tweet=tweet[language])
                     }
                 ]
 
-
 label_extra_body = {
-    "guided_choice": guided_choice,
+    "guided_choice": guided_choice[language][experiment],
     "temperature": 0.7,
     "max_tokens": 16,
     "top_k": 50,
@@ -91,23 +115,11 @@ async def run_all(instructions):
     return results
 
 # 6/ Run all courutines
-headers = ['tweet', 'choice']
+results = asyncio.run(run_all(instructions[language][experiment]))
 
-results_1 = asyncio.run(run_all(instructions_1))
-results_file_1 = "results_promts_1.csv"
-with open(results_file_1, 'w') as f:
+headers = ['id', 'choice']
+with open(results_file, 'w') as f:
     writer =  csv.writer(f)
     writer.writerow(headers)
-    writer.writerows(results_1)
-    print(f"LLM answers (={len(results_1)}) saved to {results_file_1}")
-
-results_2 = asyncio.run(run_all(instructions_2))
-results_file_2 = "results_promts_2.csv"
-with open(results_file_2, 'w') as f:
-    writer =  csv.writer(f)
-    writer.writerow(headers)
-    writer.writerows(results_2)
-    print(f"LLM answers (={len(results_2)}) saved to {results_file_2}")
-
-
-
+    writer.writerows('\n'.join(enumerate(results)))
+print(f"LLM answers (={len(results)}) saved to {results_file}")
