@@ -1,4 +1,21 @@
+import os
 import csv
+import asyncio
+from time import sleep
+from openai import OpenAI
+from string import Template
+from argparse import ArgumentParser
+import subprocess as sp
+from subprocess import Popen, PIPE
+
+ap = ArgumentParser(prog="Create python commands or slurm jobs for openia async requests.")
+ap.add_argument('--tweets_file', required=True, type=str)
+ap.add_argument('--experiment', required=True, type=int)
+args = ap.parse_args()
+tweets_file = args.tweets_file
+experiment = args.experiment
+
+results_file = f"results_promts_experiment_{experiment}_{tweets_file.split('.csv')[0]}.csv"
 
 guided_choice = [
     "Macron",
@@ -7,22 +24,11 @@ guided_choice = [
     "Aucun"
 ]
 
-instructions_1 = """Tu vas classifier des messages des médias sociaux selon s’ils expriment l’intention de voter pour un candidat
-ou s’ils appellent à voter pour un candidat à l’élection présidentielle de 2022 en France.
-Dis moi si le message suivant exprime l'intention de voter pour ou appelle à voter pour Macron, Mélenchon ou Le Pen,
-en répondant uniquement par le nom de famille du candidat, ou par “Aucun”, si le message ne montre soutien pour aucun de ces trois candidats.
-Voici le message: ${tweet}
-"""
-
-instructions_2 = """Tu vas classifier des messages des médias sociaux selon s’ils expriment du soutien pour un candidat
-à l’élection présidentielle de 2022 en France.
-Dis moi si le message suivant exprime du soutien pour Macron, Mélenchon ou Le Pen, en répondant uniquement
-par le nom de famille du candidat, ou par le mot “Autre”, si le message n’exprime pas d’intention vote ou appelle
-à voter pour l’un de ces trois candidats.
-Voici le message: ${tweet}
-"""
-
-with open('sample_xan_seed_761.csv', newline='') as f:
+instructions = {
+    1: "Tu vas classifier des messages des médias sociaux selon s’ils expriment l’intention de voter pour un candidat ou s’ils appellent à voter pour un candidat à l’élection présidentielle de 2022 en France. Dis moi si le message suivant exprime l'intention de voter pour ou appelle à voter pour Macron, Mélenchon ou Le Pen, en répondant uniquement par le nom de famille du candidat, ou par “Aucun”, si le message ne montre soutien pour aucun de ces trois candidats. Voici le message: ${tweet}",
+    2 : "Tu vas classifier des messages des médias sociaux selon s’ils expriment du soutien pour un candidat à l’élection présidentielle de 2022 en France. Dis moi si le message suivant exprime du soutien pour Macron, Mélenchon ou Le Pen, en répondant uniquement par le nom de famille du candidat, ou par le mot “Autre”, si le message n’exprime pas d’intention vote ou appelleà voter pour l’un de ces trois candidats. Voici le message: ${tweet}"
+}
+with open(tweets_file, newline='') as f:
     tweets = [r[:-1] for r in f.readlines()][1:]
 print(f"Load {len(tweets)} tweets.")
 
@@ -70,7 +76,6 @@ async def asyncMessageIterator(instructions):
                     }
                 ]
 
-
 label_extra_body = {
     "guided_choice": guided_choice,
     "temperature": 0.7,
@@ -93,21 +98,21 @@ async def run_all(instructions):
 # 6/ Run all courutines
 headers = ['tweet', 'choice']
 
-results_1 = asyncio.run(run_all(instructions_1))
-results_file_1 = "results_promts_1.csv"
-with open(results_file_1, 'w') as f:
+results = asyncio.run(run_all(instructions[experiment]))
+with open(results_file, 'w') as f:
     writer =  csv.writer(f)
     writer.writerow(headers)
-    writer.writerows(results_1)
-    print(f"LLM answers (={len(results_1)}) saved to {results_file_1}")
-
-results_2 = asyncio.run(run_all(instructions_2))
-results_file_2 = "results_promts_2.csv"
-with open(results_file_2, 'w') as f:
-    writer =  csv.writer(f)
-    writer.writerow(headers)
-    writer.writerows(results_2)
-    print(f"LLM answers (={len(results_2)}) saved to {results_file_2}")
+    writer.writerows(zip(tweets, results))
+print(f"LLM answers (={len(results)}) saved to {results_file}")
 
 
+# 7/ Kill vllm server
+cmd_tokill = {'vllm', 'python3'}
+p = Popen(['ps'], stdout=PIPE)
+ps_out = p.communicate()[0].decode().split('\n')
+pids_tokill = [l.split(' ')[0] for l in ps_out if l.split(' ')[-1] in cmd_tokill]
 
+for pid in pids_tokill:
+    pipe = sp.Popen(f'kill {pid}', shell=True, stdout=sp.PIPE, stderr=sp.PIPE )
+    res = pipe.communicate()
+    assert pipe.returncode == 0
