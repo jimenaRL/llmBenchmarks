@@ -1,5 +1,6 @@
 import os
 import csv
+import time
 import asyncio
 from time import sleep
 from openai import OpenAI
@@ -100,7 +101,7 @@ label_extra_body = {
     "repetition_penalty": 1.2,
     }
 
-async def run_all(instructions):
+async def run_all(instructions, messages):
     # Asynchronously call the function for each prompt
     tasks = [
         doCompletetion(model, messages, label_extra_body)
@@ -111,12 +112,16 @@ async def run_all(instructions):
     return results
 
 # 6/ Run all courutines
+start = time.time()
 results = asyncio.run(run_all(instructions[language][experiment]))
+end = time.time()
+
 with open(results_file, 'w') as f:
     writer =  csv.writer(f)
     writer.writerow(headers)
     writer.writerows(zip(tweets, results))
-print(f"LLM answers (={len(results)}) saved to {results_file}")
+print(f"LLM answers (={len(results)}) saved to {results_file}.")
+print(f"Took {end - start} seconds.")
 
 
 # 7/ Kill vllm server
