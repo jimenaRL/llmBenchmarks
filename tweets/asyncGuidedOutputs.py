@@ -5,6 +5,8 @@ from time import sleep
 from openai import OpenAI
 from string import Template
 from argparse import ArgumentParser
+import subprocess as sp
+from subprocess import Popen, PIPE
 
 ap = ArgumentParser(prog="Create python commands or slurm jobs for openia async requests.")
 ap.add_argument('--tweets_file', required=True, type=str)
@@ -49,6 +51,14 @@ with open('Giants.csv', mode ='r')as file:
 with open(tweets_file, newline='') as f:
     csvFile = csv.DictReader(f)
     tweets = [l for l in csvFile]
+=======
+instructions = {
+    1: "Tu vas classifier des messages des médias sociaux selon s’ils expriment l’intention de voter pour un candidat ou s’ils appellent à voter pour un candidat à l’élection présidentielle de 2022 en France. Dis moi si le message suivant exprime l'intention de voter pour ou appelle à voter pour Macron, Mélenchon ou Le Pen, en répondant uniquement par le nom de famille du candidat, ou par “Aucun”, si le message ne montre soutien pour aucun de ces trois candidats. Voici le message: ${tweet}",
+    2 : "Tu vas classifier des messages des médias sociaux selon s’ils expriment du soutien pour un candidat à l’élection présidentielle de 2022 en France. Dis moi si le message suivant exprime du soutien pour Macron, Mélenchon ou Le Pen, en répondant uniquement par le nom de famille du candidat, ou par le mot “Autre”, si le message n’exprime pas d’intention vote ou appelleà voter pour l’un de ces trois candidats. Voici le message: ${tweet}"
+}
+with open(tweets_file, newline='') as f:
+    tweets = [r[:-1] for r in f.readlines()][1:]
+>>>>>>> 902829cf5cd96b217493cb4d463d7e2d8ba8b388
 print(f"Load {len(tweets)} tweets.")
 
 # 0/ Launch vllm server
@@ -116,10 +126,20 @@ async def run_all(instructions):
 
 # 6/ Run all courutines
 results = asyncio.run(run_all(instructions[language][experiment]))
-
-headers = ['id', 'choice']
 with open(results_file, 'w') as f:
     writer =  csv.writer(f)
     writer.writerow(headers)
-    writer.writerows('\n'.join(enumerate(results)))
+    writer.writerows(zip(tweets, results))
 print(f"LLM answers (={len(results)}) saved to {results_file}")
+
+
+# 7/ Kill vllm server
+cmd_tokill = {'vllm', 'python3'}
+p = Popen(['ps'], stdout=PIPE)
+ps_out = p.communicate()[0].decode().split('\n')
+pids_tokill = [l.split(' ')[0] for l in ps_out if l.split(' ')[-1] in cmd_tokill]
+
+for pid in pids_tokill:
+    pipe = sp.Popen(f'kill {pid}', shell=True, stdout=sp.PIPE, stderr=sp.PIPE )
+    res = pipe.communicate()
+    assert pipe.returncode == 0
