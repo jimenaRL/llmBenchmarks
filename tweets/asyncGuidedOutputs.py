@@ -26,9 +26,12 @@ Voici le message: ${tweet}
 
 with open('sample_xan_seed_761.csv', newline='') as f:
     tweets = [r[:-1] for r in f.readlines()][1:]
+print(f"Load {len(tweets)} tweets.")
 
 # 0/ Launch vllm server
-os.system("vllm serve HuggingFaceH4/zephyr-7b-beta --guided-decoding-backend=xgrammar --disable-log-stats --dtype=half &")
+cmd = "vllm serve HuggingFaceH4/zephyr-7b-beta --guided-decoding-backend=xgrammar --disable-log-stats --dtype=half &"
+os.system(cmd)
+print(f"Launched command:\n\t{cmd}")
 
 # 4/ Wait for vllm server to be available and retrive model
 openai_api_key = "EMPTY"
