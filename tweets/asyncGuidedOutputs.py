@@ -1,6 +1,4 @@
 import csv
-from vllm import LLM, SamplingParams
-from vllm.sampling_params import GuidedDecodingParams
 
 guided_choice = [
     "Macron",
