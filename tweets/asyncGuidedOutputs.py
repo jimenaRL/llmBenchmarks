@@ -37,11 +37,15 @@ instructions = {
         2 : "Tu vas classifier des messages des médias sociaux selon s’ils expriment du soutien pour un candidat à l’élection présidentielle de 2022 en France. Dis moi si le message suivant exprime du soutien pour Macron, Mélenchon ou Le Pen, en répondant uniquement par le nom de famille du candidat, ou par le mot “Autre”, si le message n’exprime pas d’intention vote ou appelleà voter pour l’un de ces trois candidats. Voici le message: ${tweet}"
     },
     "english": {
-        1: "You'll classify social media posts based on whether they express the intention to vote for a candidate or if they call for a vote for a candidate in the 2022 presidential election in France. Tell me if the following message expresses the intention to vote for or calls for a vote for Macron, Mélenchon or Le Pen, replying only with the candidate's last name, or with 'None', if the message does not show support for any of these three candidates. Here is the message:: ${tweet}",
-        2: " You'll classify social media posts based on whether they express support for a candidate in the 2022 presidential election in France. Tell me if the following message expresses support for Macron, Mélenchon or Le Pen, by replying only with the candidate's last name, or with the word 'Other', if the message does not express an intention to vote or calls for a vote for one of these three candidates. Here is the message: ${tweet}"
+        1: "You'll classify social media posts based on whether they express the intention to vote for a candidate or if they call for a vote for a candidate in the 2022 presidential election in France. Tell me if the following message expresses the intention to vote for or calls for a vote for Macron, Mélenchon or Le Pen, replying only with the candidate's last name, or with 'None', if the message does not show support for any of these three candidates. Here is the message: ${tweet}",
+        2: "You'll classify social media posts based on whether they express support for a candidate in the 2022 presidential election in France. Tell me if the following message expresses support for Macron, Mélenchon or Le Pen, by replying only with the candidate's last name, or with the word 'Other', if the message does not express an intention to vote or calls for a vote for one of these three candidates. Here is the message: ${tweet}"
     },
 }
 
+system = {
+    "french": "Tu es un expert en politique française.",
+    "english":"You are an expert in French politics."
+}
 
 with open(tweets_file, newline='') as f:
     csvFile = csv.DictReader(f)
@@ -84,7 +88,7 @@ async def asyncMessageIterator(instructions, language):
         yield [
                     {
                         "role": "system",
-                        "content": "Tu es un expert en politique française."
+                        "content": system[language]
                     },
                     {
                         "role": "user",
