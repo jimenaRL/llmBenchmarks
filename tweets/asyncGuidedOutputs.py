@@ -9,7 +9,7 @@ from argparse import ArgumentParser
 import subprocess as sp
 from subprocess import Popen, PIPE
 
-ap = ArgumentParser(prog="Create python commands or slurm jobs for openia async requests.")
+ap = ArgumentParser(prog="Make openia async requests.")
 ap.add_argument('--tweets_file', required=True, type=str)
 ap.add_argument('--language', required=True, type=str, choices=["english", "french"])
 ap.add_argument('--experiment', required=True, type=int, choices=[1, 2])
