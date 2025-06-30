@@ -55,9 +55,10 @@ def messageIterator():
 
 prompts = [m for m in messageIterator()]
 
-outputs = llm.generate(
-    prompts=prompts,
+outputs = llm.chat(
+    messages=messages,
     sampling_params=sampling_params,
+    use_tqdm=True
 )
 
 # results = output.outputs[0].text
