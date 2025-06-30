@@ -58,13 +58,15 @@ def messageIterator():
 
 messages = [m for m in messageIterator()]
 
+start = time.time()
 outputs = llm.chat(
     messages=messages,
     sampling_params=sampling_params,
     use_tqdm=True
 )
-
 results = [o.outputs[0].text for o in outputs]
+end = time.time()
+print(f"Took {end - start} seconds.")
 
 headers = ["tweet", f"choice"]
 with open(results_file, 'w') as f:
