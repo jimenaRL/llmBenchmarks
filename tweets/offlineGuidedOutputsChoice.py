@@ -23,7 +23,7 @@ ap.add_argument('--results_file', required=True, type=str)
 args = ap.parse_args()
 llm = args.llm
 sampling_params = json.loads(args.sampling_params)
-guided_choice = ','.split(args.guided_choice)
+guided_choice = args.guided_choice.split(',')
 tweets_file = args.tweets_file
 system_prompt = args.system_prompt
 user_prompt = args.user_prompt
@@ -33,10 +33,13 @@ if not os.path.exists(tweets_file):
     raise ValueError(f"Unnable to find tweets fiel at {tweets_file}")
 with open(tweets_file, newline='') as f:
     csvFile = csv.DictReader(f)
-    tweets = [l for l in csvFile]
+    tweets = [row['tweet'] for row in csvFile]
 print(f"Load {len(tweets)} tweets from {tweets_file}.")
 
-llm = LLM(model=llm)
+llm = LLM(
+    model=llm,
+    guided_decoding_backend="xgrammar"
+)
 sampling_params.update({"guided_decoding": GuidedDecodingParams(choice=guided_choice)})
 sampling_params = SamplingParams(**sampling_params)
 
@@ -53,7 +56,7 @@ def messageIterator():
                     }
                 ]
 
-prompts = [m for m in messageIterator()]
+messages = [m for m in messageIterator()]
 
 outputs = llm.chat(
     messages=messages,
@@ -61,15 +64,12 @@ outputs = llm.chat(
     use_tqdm=True
 )
 
-# results = output.outputs[0].text
-# content = completion.choices[0].message.content
+results = [o.outputs[0].text for o in outputs]
 
-
-
-# headers = ["id", f"choice"]
-# with open(results_file, 'w') as f:
-#     writer =  csv.writer(f)
-#     writer.writerow(headers)
-#     writer.writerows(enumerate(results))
-# print(f"LLM answers (={len(results)}) saved to {results_file}.")
+headers = ["tweet", f"choice"]
+with open(results_file, 'w') as f:
+   writer =  csv.writer(f)
+   writer.writerow(headers)
+   writer.writerows(zip(tweets, results))
+print(f"LLM answers (={len(results)}) saved to {results_file}.")
 
