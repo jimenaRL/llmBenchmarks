@@ -63,6 +63,7 @@ def messageIterator():
                 ]
 
 messages = [m for m in messageIterator()]
+print(messages)
 
 outputs = llm.chat(
     messages=messages,
@@ -70,20 +71,14 @@ outputs = llm.chat(
     use_tqdm=True
 )
 
-results = [o[0].outputs[0].text for o in outputs]
+results = []
+for n, (tweet, o) in enumerate(zip(tweet,outputs)):
+    results.append([idx, tweet, o.outputs[0].text])
 
-
-import pdb; pdb.set_trace()  # breakpoint ec46ceae //
-
-# results = output.outputs[0].text
-# content = completion.choices[0].message.content
-
-
-
-# headers = ["id", f"choice"]
-# with open(results_file, 'w') as f:
-#     writer =  csv.writer(f)
-#     writer.writerow(headers)
-#     writer.writerows(enumerate(results))
-# print(f"LLM answers (={len(results)}) saved to {results_file}.")
+headers = ["id", "tweet", "choice"]
+with open(results_file, 'w') as f:
+    writer =  csv.writer(f)
+    writer.writerow(headers)
+    writer.writerows(results)
+print(f"LLM answers (={len(results)}) saved to {results_file}.")
 
