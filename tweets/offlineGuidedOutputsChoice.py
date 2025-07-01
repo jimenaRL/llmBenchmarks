@@ -31,6 +31,10 @@ system_prompt = args.system_prompt
 user_prompt = args.user_prompt
 results_file = args.results_file
 
+parameters = vars(args)
+parameters = json.dumps(parameters, sort_keys=True, indent=4)
+print(f"PARAMETERS:\n{parameters[2:-2]}")
+
 if not os.path.exists(tweets_file):
     raise ValueError(f"Unnable to find tweets file at {tweets_file}")
 with open(tweets_file, newline='') as f:
