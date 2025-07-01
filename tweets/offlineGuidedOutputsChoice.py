@@ -32,7 +32,7 @@ user_prompt = args.user_prompt
 results_file = args.results_file
 
 if not os.path.exists(tweets_file):
-    raise ValueError(f"Unnable to find tweets fiel at {tweets_file}")
+    raise ValueError(f"Unnable to find tweets file at {tweets_file}")
 with open(tweets_file, newline='') as f:
     csvFile = csv.DictReader(f)
     tweets = [l[tweets_column] for l in csvFile]
