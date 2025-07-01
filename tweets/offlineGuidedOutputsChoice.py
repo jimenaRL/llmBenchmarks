@@ -8,7 +8,7 @@ from argparse import ArgumentParser
 from vllm import LLM, SamplingParams
 from vllm.sampling_params import GuidedDecodingParams
 
-DEFAULTLLMPARAMS = '{"model": "HuggingFaceH4/zephyr-7b-beta", "gpu_memory_utilization": 1, "max_model_len": 21500, "dtype": "half""}'
+DEFAULTLLMPARAMS = '{"model": "HuggingFaceH4/zephyr-7b-beta", "gpu_memory_utilization": 1, "max_model_len": 21500, "dtype": "half"}'
 DEFAULTSAMPLINGPARAMS = '{"temperature": 0.7, "top_p": 0.95, "top_k": 50, "max_tokens": 16, "repetition_penalty": 1.2}'
 DEFAULTDECODING = "xgrammar"
 
