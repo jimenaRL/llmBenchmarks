@@ -26,7 +26,7 @@ ap.add_argument('--results_file', required=True, type=str)
 args = ap.parse_args()
 llm_params = json.loads(args.llm_params)
 sampling_params = json.loads(args.sampling_params)
-guided_choice = ','.split(args.guided_choice)
+guided_choice = args.guided_choice.split(',')
 guided_decoding_backend = args.guided_decoding_backend
 tweets_file = args.tweets_file
 tweets_column = args.tweets_column
