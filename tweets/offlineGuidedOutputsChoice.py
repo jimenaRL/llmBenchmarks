@@ -64,11 +64,13 @@ def messageIterator():
 
 messages = [m for m in messageIterator()]
 
+start = time.time()
 outputs = llm.chat(
     messages=messages,
     sampling_params=sampling_params,
     use_tqdm=True
 )
+print(f"Took {time.time() - start} seconds.")
 
 results = []
 for n, (tweet, o) in enumerate(zip(tweets, outputs)):
@@ -81,3 +83,4 @@ with open(results_file, 'w') as f:
     writer.writerows(results)
 print(f"LLM answers (={len(results)}) saved to {results_file}.")
 
+exit()
