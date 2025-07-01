@@ -72,7 +72,7 @@ outputs = llm.chat(
 )
 
 results = []
-for n, (tweet, o) in enumerate(zip(tweet,outputs)):
+for n, (tweet, o) in enumerate(zip(tweets, outputs)):
     results.append([idx, tweet, o.outputs[0].text])
 
 headers = ["id", "tweet", "choice"]
