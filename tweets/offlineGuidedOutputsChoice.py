@@ -34,6 +34,8 @@ system_prompt = args.system_prompt
 user_prompt = args.user_prompt
 results_file = args.results_file
 
+llm_params.update({"guided_decoding_backend": guided_decoding_backend})
+
 parameters = vars(args)
 parameters = json.dumps(parameters, sort_keys=True, indent=4)
 print(f"PARAMETERS:\n{parameters[2:-2]}")
