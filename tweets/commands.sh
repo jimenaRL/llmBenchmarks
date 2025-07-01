@@ -1,5 +1,6 @@
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=french \
     --guided_choice=OUI,NON \
     --system_prompt="Tu es un expert en politique française." \
     --user_prompt='Tu vas classifier des messages des médias sociaux qui ont été publiés dans les semaines qui précèdent l’élection présidentielle de 2022 en France. Tu vas classifier les messages selon s’ils expriment du soutien ou des attitudes positives envers Le Pen dans cette élection. Tu dois utiliser uniquement l’information contenue dans le message, et tu dois répondre uniquement par OUI ou NON. Le message suivant, exprime-t-il du soutien ou des attitudes positives envers Le Pen: ${tweet}' \
@@ -7,6 +8,7 @@ python offlineGuidedOutputsChoice.py \
 
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=french \
     --guided_choice=OUI,NON \
     --system_prompt="Tu es un expert en politique française." \
     --user_prompt='Tu vas classifier des messages des médias sociaux qui ont été publiés dans les semaines qui précèdent l’élection présidentielle de 2022 en France. Tu vas classifier les messages selon s’ils expriment du soutien ou des attitudes positives envers Macron dans cette élection. Tu dois utiliser uniquement l’information contenue dans le message, et tu dois répondre uniquement par OUI ou NON. Le message suivant, exprime-t-il du soutien ou des attitudes positives envers Macron: ${tweet}' \
@@ -15,6 +17,7 @@ python offlineGuidedOutputsChoice.py \
 
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=french \
     --guided_choice=OUI,NON \
     --system_prompt="Tu es un expert en politique française." \
     --user_prompt='Tu vas classifier des messages des médias sociaux qui ont été publiés dans les semaines qui précèdent l’élection présidentielle de 2022 en France. Tu vas classifier les messages selon s’ils expriment du soutien ou des attitudes positives envers Mélenchon dans cette élection. Tu dois utiliser uniquement l’information contenue dans le message, et tu dois répondre uniquement par OUI ou NON. Le message suivant, exprime-t-il du soutien ou des attitudes positives envers Mélenchon: ${tweet}' \
@@ -23,6 +26,7 @@ python offlineGuidedOutputsChoice.py \
 
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=french \
     --guided_choice=OUI,NON \
     --system_prompt="Tu es un expert en politique française." \
     --user_prompt='Tu vas classifier des messages des médias sociaux qui ont été publiés dans les semaines qui précèdent l’élection présidentielle de 2022 en France. Tu vas classifier les messages selon s’ils expriment des critiques ou des attitudes négatives envers Le Pen dans cette élection. Tu dois utiliser uniquement l’information contenue dans le message, et tu dois répondre uniquement par OUI ou NON. Le message suivant, exprime-t-il des critiques ou des attitudes négatives envers Le Pen: ${tweet}' \
@@ -30,6 +34,7 @@ python offlineGuidedOutputsChoice.py \
 
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=french \
     --guided_choice=OUI,NON \
     --system_prompt="Tu es un expert en politique française." \
     --user_prompt='Tu vas classifier des messages des médias sociaux qui ont été publiés dans les semaines qui précèdent l’élection présidentielle de 2022 en France. Tu vas classifier les messages selon s’ils expriment des critiques ou des attitudes négatives envers Macron dans cette élection. Tu dois utiliser uniquement l’information contenue dans le message, et tu dois répondre uniquement par OUI ou NON. Le message suivant, exprime-t-il des critiques ou des attitudes négatives envers Macron: ${tweet}' \
@@ -37,6 +42,7 @@ python offlineGuidedOutputsChoice.py \
 
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=french \
     --guided_choice=OUI,NON \
     --system_prompt="Tu es un expert en politique française." \
     --user_prompt='Tu vas classifier des messages des médias sociaux qui ont été publiés dans les semaines qui précèdent l’élection présidentielle de 2022 en France. Tu vas classifier les messages selon s’ils expriment des critiques ou des attitudes négatives envers Mélenchon dans cette élection. Tu dois utiliser uniquement l’information contenue dans le message, et tu dois répondre uniquement par OUI ou NON. Le message suivant, exprime-t-il des critiques ou des attitudes négatives envers Mélenchon: ${tweet}' \
@@ -44,6 +50,7 @@ python offlineGuidedOutputsChoice.py \
 
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=french \
     --guided_choice=OUI,NON \
     --system_prompt="Tu es un expert en politique française." \
     --user_prompt='Tu vas classifier des messages des médias sociaux qui ont été publiés dans les semaines qui précèdent l’élection présidentielle de 2022 en France. Tu vas classifier les messages selon s’ils expriment l’intention de voter pour Le Pen dans cette élection. Tu dois utiliser uniquement l’information contenue dans le message, analysant uniquement les mentions explicites d’intention de vote, et tu dois répondre uniquement par OUI ou NON. Le message suivant, exprime-t-il une intention explicite de voter pour Le Pen: ${tweet}' \
@@ -51,6 +58,7 @@ python offlineGuidedOutputsChoice.py \
 
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=french \
     --guided_choice=OUI,NON \
     --system_prompt="Tu es un expert en politique française." \
     --user_prompt='Tu vas classifier des messages des médias sociaux qui ont été publiés dans les semaines qui précèdent l’élection présidentielle de 2022 en France. Tu vas classifier les messages selon s’ils expriment l’intention de voter pour Macron dans cette élection. Tu dois utiliser uniquement l’information contenue dans le message, analysant uniquement les mentions explicites d’intention de vote, et tu dois répondre uniquement par OUI ou NON. Le message suivant, exprime-t-il une intention explicite de voter pour Macron: ${tweet}' \
@@ -58,6 +66,7 @@ python offlineGuidedOutputsChoice.py \
 
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=french \
     --guided_choice=OUI,NON \
     --system_prompt="Tu es un expert en politique française." \
     --user_prompt='Tu vas classifier des messages des médias sociaux qui ont été publiés dans les semaines qui précèdent l’élection présidentielle de 2022 en France. Tu vas classifier les messages selon s’ils expriment l’intention de voter pour Mélenchon dans cette élection. Tu dois utiliser uniquement l’information contenue dans le message, analysant uniquement les mentions explicites d’intention de vote, et tu dois répondre uniquement par OUI ou NON. Le message suivant, exprime-t-il une intention explicite de voter pour Mélenchon: ${tweet}' \
@@ -66,6 +75,7 @@ python offlineGuidedOutputsChoice.py \
 
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=english \
     --guided_choice=YES,NO \
     --system_prompt="You are an expert in French politics." \
     --user_prompt="You're going to classify social media posts that were posted in the weeks leading up to the 2022 presidential election in France. You will classify the messages according to whether they express support or positive attitudes towards Le Pen in this election. You must use only the information contained in the message, and you must answer only with YES or NO. Does the following message express support or positive attitudes towards Le Pen: ${tweet}" \
@@ -73,6 +83,7 @@ python offlineGuidedOutputsChoice.py \
 
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=english \
     --guided_choice=YES,NO \
     --system_prompt="You are an expert in French politics." \
     --user_prompt="You're going to classify social media posts that were posted in the weeks leading up to the 2022 presidential election in France. You will classify the messages according to whether they express support or positive attitudes towards Macron in this election. You must use only the information contained in the message, and you must answer only with YES or NO. Does the following message express support or positive attitudes towards Macron: ${tweet}" \
@@ -81,6 +92,7 @@ python offlineGuidedOutputsChoice.py \
 
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=english \
     --guided_choice=YES,NO \
     --system_prompt="You are an expert in French politics." \
     --user_prompt="You're going to classify social media posts that were posted in the weeks leading up to the 2022 presidential election in France. You will classify the messages according to whether they express support or positive attitudes towards Mélenchon in this election. You must use only the information contained in the message, and you must answer only with YES or NO. Does the following message express support or positive attitudes towards Mélenchon: ${tweet}" \
@@ -89,6 +101,7 @@ python offlineGuidedOutputsChoice.py \
 
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=english \
     --guided_choice=YES,NO \
     --user_prompt="You're going to classify social media posts that were posted in the weeks leading up to the 2022 presidential election in France. You will classify the messages according to whether they express criticism or negative attitudes towards Le Pen in this election. You must use only the information contained in the message, and you must answer only with YES or NO. Does the following message express criticism or negative attitudes towards Le Pen: ${tweet}" \
     --system_prompt="You are an expert in French politics." \
@@ -96,6 +109,7 @@ python offlineGuidedOutputsChoice.py \
 
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=english \
     --guided_choice=YES,NO \
     --system_prompt="You are an expert in French politics." \
     --user_prompt="You're going to classify social media posts that were posted in the weeks leading up to the 2022 presidential election in France. You will classify the messages according to whether they express criticism or negative attitudes towards Macron in this election. You must use only the information contained in the message, and you must answer only with YES or NO. Does the following message express criticism or negative attitudes towards Macron: ${tweet}" \
@@ -103,6 +117,7 @@ python offlineGuidedOutputsChoice.py \
 
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=english \
     --guided_choice=YES,NO \
     --system_prompt="You are an expert in French politics." \
     --user_prompt="You're going to classify social media posts that were posted in the weeks leading up to the 2022 presidential election in France. You will classify the messages according to whether they express criticism or negative attitudes towards Mélenchon in this election. You must use only the information contained in the message, and you must answer only with YES or NO. Does the following message express criticism or negative attitudes towards Mélenchon: ${tweet}" \
@@ -110,6 +125,7 @@ python offlineGuidedOutputsChoice.py \
 
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=english \
     --guided_choice=YES,NO \
     --user_prompt="You're going to classify social media posts that were posted in the weeks leading up to the 2022 presidential election in France. You will classify the messages according to whether they express the intention to vote for Le Pen in this election. You must use only the information contained in the message, analyzing only the explicit mentions of voting intention, and you must answer only with YES or NO. Does the following message express an explicit intention to vote for Le Pen: ${tweet}" \
     --system_prompt="You are an expert in French politics." \
@@ -117,6 +133,7 @@ python offlineGuidedOutputsChoice.py \
 
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=english \
     --guided_choice=YES,NO \
     --system_prompt="You are an expert in French politics." \
     --user_prompt="You're going to classify social media posts that were posted in the weeks leading up to the 2022 presidential election in France. You will classify the messages according to whether they express the intention to vote for Macron in this election. You must use only the information contained in the message, analyzing only the explicit mentions of voting intention, and you must answer only with YES or NO. Does the following message express an explicit intention to vote for Macron: ${tweet}" \
@@ -124,7 +141,8 @@ python offlineGuidedOutputsChoice.py \
 
 python offlineGuidedOutputsChoice.py \
     --tweets_file=200_sampled_xan_seed_123.csv \
+    --tweets_column=english \
     --guided_choice=YES,NO \
     --system_prompt="You are an expert in French politics." \
     --user_prompt="You're going to classify social media posts that were posted in the weeks leading up to the 2022 presidential election in France. You will classify the messages according to whether they express the intention to vote for Mélenchon in this election. You must use only the information contained in the message, analyzing only the explicit mentions of voting intention, and you must answer only with YES or NO. Does the following message express an explicit intention to vote for Mélenchon: ${tweet}" \
-    --results_file=results_en_vote_intention_Mélenchon_200_sampled_xan_seed_123.csv && \
+    --results_file=results_en_vote_intention_Mélenchon_200_sampled_xan_seed_123.csv

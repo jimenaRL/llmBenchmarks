@@ -18,13 +18,15 @@ ap.add_argument('--guided_choice', required=True, type=str)
 ap.add_argument('--system_prompt', required=True, type=str)
 ap.add_argument('--user_prompt', required=True, type=str)
 ap.add_argument('--tweets_file', required=True, type=str)
+ap.add_argument('--tweets_column', required=True, type=str)
 ap.add_argument('--results_file', required=True, type=str)
 
 args = ap.parse_args()
 llm = args.llm
 sampling_params = json.loads(args.sampling_params)
-guided_choice = args.guided_choice.split(',')
+guided_choice = ','.split(args.guided_choice)
 tweets_file = args.tweets_file
+tweets_column = args.tweets_column
 system_prompt = args.system_prompt
 user_prompt = args.user_prompt
 results_file = args.results_file
@@ -33,13 +35,10 @@ if not os.path.exists(tweets_file):
     raise ValueError(f"Unnable to find tweets fiel at {tweets_file}")
 with open(tweets_file, newline='') as f:
     csvFile = csv.DictReader(f)
-    tweets = [row['tweet'] for row in csvFile]
-print(f"Load {len(tweets)} tweets from {tweets_file}.")
+    tweets = [l[tweets_column] for l in csvFile]
+print(f"Load {len(tweets)} tweets from column {tweets_column} on {tweets_file}.")
 
-llm = LLM(
-    model=llm,
-    guided_decoding_backend="xgrammar"
-)
+llm = LLM(model=llm)
 sampling_params.update({"guided_decoding": GuidedDecodingParams(choice=guided_choice)})
 sampling_params = SamplingParams(**sampling_params)
 
@@ -58,20 +57,26 @@ def messageIterator():
 
 messages = [m for m in messageIterator()]
 
-start = time.time()
 outputs = llm.chat(
     messages=messages,
     sampling_params=sampling_params,
     use_tqdm=True
 )
-results = [o.outputs[0].text for o in outputs]
-end = time.time()
-print(f"Took {end - start} seconds.")
 
-headers = ["tweet", f"choice"]
-with open(results_file, 'w') as f:
-   writer =  csv.writer(f)
-   writer.writerow(headers)
-   writer.writerows(zip(tweets, results))
-print(f"LLM answers (={len(results)}) saved to {results_file}.")
+results = [o[0].outputs[0].text for o in outputs]
+
+
+import pdb; pdb.set_trace()  # breakpoint ec46ceae //
+
+# results = output.outputs[0].text
+# content = completion.choices[0].message.content
+
+
+
+# headers = ["id", f"choice"]
+# with open(results_file, 'w') as f:
+#     writer =  csv.writer(f)
+#     writer.writerow(headers)
+#     writer.writerows(enumerate(results))
+# print(f"LLM answers (={len(results)}) saved to {results_file}.")
 
