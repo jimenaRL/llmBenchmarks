@@ -63,7 +63,6 @@ def messageIterator():
                 ]
 
 messages = [m for m in messageIterator()]
-print(messages)
 
 outputs = llm.chat(
     messages=messages,
