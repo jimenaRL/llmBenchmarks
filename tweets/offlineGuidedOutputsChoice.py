@@ -8,13 +8,13 @@ from argparse import ArgumentParser
 from vllm import LLM, SamplingParams
 from vllm.sampling_params import GuidedDecodingParams
 
-DEFAULTLLM = "HuggingFaceH4/zephyr-7b-beta"
-DEFAULTPARAMS = '{"temperature": 0.7, "top_p": 0.95, "top_k": 50, "max_tokens": 16, "repetition_penalty": 1.2}'
+DEFAULTLLMPARAMS = '{"model": "HuggingFaceH4/zephyr-7b-beta", "gpu_memory_utilization": 1, "max_model_len": 21500, "dtype": "half""}'
+DEFAULTSAMPLINGPARAMS = '{"temperature": 0.7, "top_p": 0.95, "top_k": 50, "max_tokens": 16, "repetition_penalty": 1.2}'
 DEFAULTDECODING = "xgrammar"
 
 ap = ArgumentParser(prog="Make openia async requests.")
-ap.add_argument('--llm', required=False, type=str, default=DEFAULTLLM)
-ap.add_argument('--sampling_params', required=False, type=str, default=DEFAULTPARAMS)
+ap.add_argument('--llm_params', required=False, type=str, default=DEFAULTLLMPARAMS)
+ap.add_argument('--sampling_params', required=False, type=str, default=DEFAULTSAMPLINGPARAMS)
 ap.add_argument('--guided_choice', required=True, type=str)
 ap.add_argument('--guided_decoding_backend', required=False, type=str, default=DEFAULTDECODING)
 ap.add_argument('--system_prompt', required=True, type=str)
@@ -24,7 +24,7 @@ ap.add_argument('--tweets_column', required=True, type=str)
 ap.add_argument('--results_file', required=True, type=str)
 
 args = ap.parse_args()
-llm = args.llm
+llm_params = json.loads(args.llm_params)
 sampling_params = json.loads(args.sampling_params)
 guided_choice = ','.split(args.guided_choice)
 guided_decoding_backend = args.guided_decoding_backend
@@ -45,7 +45,8 @@ with open(tweets_file, newline='') as f:
     tweets = [l[tweets_column] for l in csvFile]
 print(f"Load {len(tweets)} tweets from column {tweets_column} on {tweets_file}.")
 
-llm = LLM(model=llm, guided_decoding_backend=guided_decoding_backend)
+
+llm = LLM(**llm_params)
 sampling_params.update({"guided_decoding": GuidedDecodingParams(choice=guided_choice)})
 sampling_params = SamplingParams(**sampling_params)
 
