@@ -19,7 +19,7 @@ DEFAULTMODELLEN = 21500
 DEFAULTGPUUSE = 0.9
 DEFAULTSEED = 19
 
-ap = ArgumentParser(prog="Make openia async requests.")
+ap = ArgumentParser (prog="Make openia async requests.")
 ap.add_argument('--llm', required=False, type=str, default=DEFAULTLLM)
 ap.add_argument('--dtype', required=False, type=str, default=DEFAULTDTYPE)
 ap.add_argument('--max_model_len', required=False, type=int, default=DEFAULTMODELLEN)
@@ -33,6 +33,8 @@ ap.add_argument('--user_prompt', required=True, type=str)
 ap.add_argument('--tweets_file', required=True, type=str)
 ap.add_argument('--tweets_column', required=True, type=str)
 ap.add_argument('--results_file', required=True, type=str)
+ap.add_argument('--disable_log_stats', required=False, action='store_true')
+ap.add_argument('--disable_log_requests', required=False, action='store_true')
 
 args = ap.parse_args()
 llm = args.llm
@@ -48,6 +50,8 @@ tweets_column = args.tweets_column
 system_prompt = args.system_prompt
 user_prompt = args.user_prompt
 results_file = args.results_file
+disable_log_stats = args.disable_log_stats
+disable_log_requests = args.disable_log_requests
 
 #0/ Create dict parameter for openai requests
 extra_body.update({"guided_choice": guided_choice})
@@ -67,17 +71,21 @@ print(f"Load {len(tweets)} tweets from column {tweets_column} on {tweets_file}."
 
 # 2/ Launch vllm server
 # https://docs.redhat.com/en/documentation/red_hat_ai_inference_server/3.0/html/vllm_server_arguments/all-server-arguments-server-arguments
-vllm_serve_command  = f"""vllm serve {llm} \
-    --guided-decoding-backend={decoding} \
-    --max-model-len={max_model_len} \
-    --dtype={dtype} \
-    --seed={seed} \
-    --gpu-memory-utilization={gpu_memory_utilization} \
-    --disable-log-stats \
-    --disable-log-requests &
-"""
-os.system(vllm_serve_command)
+vllm_serve_command = f"vllm serve {llm} "
+vllm_serve_command += f"--guided-decoding-backend={decoding} "
+vllm_serve_command += f"--max-model-len={max_model_len} "
+vllm_serve_command += f"--dtype={dtype} "
+vllm_serve_command += f"--seed={seed} "
+vllm_serve_command += f"--guided-decoding-backend={decoding} "
+vllm_serve_command += f"--gpu-memory-utilization={gpu_memory_utilization} "
+if disable_log_stats:
+    vllm_serve_command += "--disable-log-stats "
+if disable_log_requests:
+    vllm_serve_command += "--disable-log-requests "
+vllm_serve_command += "&"
+
 print(f"Launched vllm server with command:\n\t{vllm_serve_command}")
+os.system(vllm_serve_command)
 
 # 4/ Wait for vllm server to be available and retrive model
 openai_api_key = "EMPTY"
