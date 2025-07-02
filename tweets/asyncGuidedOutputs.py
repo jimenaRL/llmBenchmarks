@@ -15,12 +15,18 @@ DEFAULTLLM = "HuggingFaceH4/zephyr-7b-beta"
 DEFAULTDTYPE = "half"
 DEFAULTDECODING = "xgrammar"
 DEFAULTSAMPLINGPARAMS = '{"temperature": 0.7, "top_p": 0.95, "top_k": 50, "max_tokens": 16, "repetition_penalty": 1.2}'
+DEFAULTMODELLEN = 21500
+DEFAULTGPUUSE = 0.9
+DEFAULTSEED = 19
 
 ap = ArgumentParser(prog="Make openia async requests.")
 ap.add_argument('--llm', required=False, type=str, default=DEFAULTLLM)
 ap.add_argument('--dtype', required=False, type=str, default=DEFAULTDTYPE)
+ap.add_argument('--max_model_len', required=False, type=int, default=DEFAULTMODELLEN)
+ap.add_argument('--gpu_memory_utilization', required=False, type=float, default=DEFAULTGPUUSE)
 ap.add_argument('--guided_decoding_backend', required=False, type=str, default=DEFAULTDECODING)
 ap.add_argument('--sampling_params', required=False, type=str, default=DEFAULTSAMPLINGPARAMS)
+ap.add_argument('--seed', required=False, type=int, default=DEFAULTSEED)
 ap.add_argument('--guided_choice', required=True, type=str)
 ap.add_argument('--system_prompt', required=True, type=str)
 ap.add_argument('--user_prompt', required=True, type=str)
@@ -31,6 +37,9 @@ ap.add_argument('--results_file', required=True, type=str)
 args = ap.parse_args()
 llm = args.llm
 dtype = args.dtype
+max_model_len = args.max_model_len
+gpu_memory_utilization = args.gpu_memory_utilization
+seed = args.seed
 decoding = args.guided_decoding_backend
 sampling_params = json.loads(args.sampling_params)
 guided_choice = args.guided_choice.split(',')
@@ -53,7 +62,16 @@ with open(tweets_file, newline='') as f:
 print(f"Load {len(tweets)} tweets from column {tweets_column} on {tweets_file}.")
 
 # 2/ Launch vllm server
-vllm_serve_command  = f"vllm serve {llm} --guided-decoding-backend={decoding} --disable-log-stats --dtype={dtype}"
+# https://docs.redhat.com/en/documentation/red_hat_ai_inference_server/3.0/html/vllm_server_arguments/all-server-arguments-server-arguments
+vllm_serve_command  = f"""vllm serve {llm} \
+    --guided-decoding-backend={decoding} \
+    --max-model-len={max_model_len} \
+    --dtype={dtype} \
+    --seed={seed} \
+    --gpu-memory-utilization={gpu_memory_utilization} \
+    --disable-log-stats \
+    --disable-log-requests
+"""
 os.system(vllm_serve_command+" &")
 print(f"Launched vllm server with command:\n\t{vllm_serve_command}")
 
@@ -95,13 +113,13 @@ async def messageIterator():
                     }
                 ]
 
-label_extra_body = sampling_params.update({"guided_choice": guided_choice})
+extra_body = sampling_params.update({"guided_choice": guided_choice})
 
 async def run_all():
     # Asynchronously call the function for each prompt
     tasks = [
-        doCompletetion(model, messages, label_extra_body, tweet)
-        async for tweet, messages in messageIterator()
+        doCompletetion(model, it[1], extra_body, it[0])
+        async for it in messageIterator()
     ]
     # Gather and run the tasks concurrently
     results = await asyncio.gather(*tasks)
@@ -118,7 +136,7 @@ with open(results_file, 'w') as f:
     writer =  csv.writer(f)
     writer.writerow(headers)
     writer.writerows(results)
-print(f"LLM answers (={len(results)}) saved to {results_file}.")
+print(f"LLM answers (={len(results)}) saved to {results_file}")
 
 
 # 7/ Kill vllm server
