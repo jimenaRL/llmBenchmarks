@@ -80,7 +80,7 @@ async def doCompletetion(model, messages, extra_body, tweet):
         model=model,
         messages=messages,
         extra_body=extra_body)
-    return idx, completion.choices[0].message.content
+    return tweet, completion.choices[0].message.content
 
 async def messageIterator():
     for tweet in enumerate(tweets):
