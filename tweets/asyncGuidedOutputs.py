@@ -1,6 +1,7 @@
 import os
 import csv
 import time
+import json
 import asyncio
 from time import sleep
 from openai import OpenAI
@@ -9,53 +10,52 @@ from argparse import ArgumentParser
 import subprocess as sp
 from subprocess import Popen, PIPE
 
+# DEFAULTLLMPARAMS = '{"model": "HuggingFaceH4/zephyr-7b-beta", "gpu_memory_utilization": 0.9, "max_model_len": 21500, "dtype": "half"}'
+DEFAULTLLM = "HuggingFaceH4/zephyr-7b-beta"
+DEFAULTDTYPE = "half"
+DEFAULTDECODING = "xgrammar"
+DEFAULTSAMPLINGPARAMS = '{"temperature": 0.7, "top_p": 0.95, "top_k": 50, "max_tokens": 16, "repetition_penalty": 1.2}'
+
 ap = ArgumentParser(prog="Make openia async requests.")
+ap.add_argument('--llm', required=False, type=str, default=DEFAULTLLM)
+ap.add_argument('--dtype', required=False, type=str, default=DEFAULTDTYPE)
+ap.add_argument('--guided_decoding_backend', required=False, type=str, default=DEFAULTDECODING)
+ap.add_argument('--sampling_params', required=False, type=str, default=DEFAULTSAMPLINGPARAMS)
+ap.add_argument('--guided_choice', required=True, type=str)
+ap.add_argument('--system_prompt', required=True, type=str)
+ap.add_argument('--user_prompt', required=True, type=str)
 ap.add_argument('--tweets_file', required=True, type=str)
-ap.add_argument('--language', required=True, type=str, choices=["english", "french"])
-ap.add_argument('--experiment', required=True, type=int, choices=[1, 2])
+ap.add_argument('--tweets_column', required=True, type=str)
+ap.add_argument('--results_file', required=True, type=str)
+
 args = ap.parse_args()
+llm = args.llm
+dtype = args.dtype
+decoding = args.guided_decoding_backend
+sampling_params = json.loads(args.sampling_params)
+guided_choice = args.guided_choice.split(',')
 tweets_file = args.tweets_file
-language = args.language
-experiment = args.experiment
+tweets_column = args.tweets_column
+system_prompt = args.system_prompt
+user_prompt = args.user_prompt
+results_file = args.results_file
 
-results_file = f"results_promts_{language}_{experiment}_{tweets_file.split('.csv')[0]}.csv"
+parameters = vars(args)
+parameters = json.dumps(parameters, sort_keys=True, indent=4)
+print(f"PARAMETERS:\n{parameters[2:-2]}")
 
-guided_choice = {
-    "french": {
-        1: ["Macron", "Mélenchon", "Le Pen", "Aucun"],
-        2: ["Macron", "Mélenchon", "Le Pen", "Autre"],
-    },
-    "english": {
-        1: ["Macron", "Mélenchon", "Le Pen", "None"],
-        2: ["Macron", "Mélenchon", "Le Pen", "Other"],
-    }
-}
-
-instructions = {
-    "french": {
-        1: "Tu vas classifier des messages des médias sociaux selon s’ils expriment l’intention de voter pour un candidat ou s’ils appellent à voter pour un candidat à l’élection présidentielle de 2022 en France. Dis moi si le message suivant exprime l'intention de voter pour ou appelle à voter pour Macron, Mélenchon ou Le Pen, en répondant uniquement par le nom de famille du candidat, ou par “Aucun”, si le message ne montre soutien pour aucun de ces trois candidats. Voici le message: ${tweet}",
-        2 : "Tu vas classifier des messages des médias sociaux selon s’ils expriment du soutien pour un candidat à l’élection présidentielle de 2022 en France. Dis moi si le message suivant exprime du soutien pour Macron, Mélenchon ou Le Pen, en répondant uniquement par le nom de famille du candidat, ou par le mot “Autre”, si le message n’exprime pas d’intention vote ou appelleà voter pour l’un de ces trois candidats. Voici le message: ${tweet}"
-    },
-    "english": {
-        1: "You'll classify social media posts based on whether they express the intention to vote for a candidate or if they call for a vote for a candidate in the 2022 presidential election in France. Tell me if the following message expresses the intention to vote for or calls for a vote for Macron, Mélenchon or Le Pen, replying only with the candidate's last name, or with 'None', if the message does not show support for any of these three candidates. Here is the message: ${tweet}",
-        2: "You'll classify social media posts based on whether they express support for a candidate in the 2022 presidential election in France. Tell me if the following message expresses support for Macron, Mélenchon or Le Pen, by replying only with the candidate's last name, or with the word 'Other', if the message does not express an intention to vote or calls for a vote for one of these three candidates. Here is the message: ${tweet}"
-    },
-}
-
-system = {
-    "french": "Tu es un expert en politique française.",
-    "english":"You are an expert in French politics."
-}
-
+# 1/ Load tweets
+if not os.path.exists(tweets_file):
+    raise ValueError(f"Unnable to find tweets file at {tweets_file}")
 with open(tweets_file, newline='') as f:
     csvFile = csv.DictReader(f)
-    tweets = [l for l in csvFile]
-print(f"Load {len(tweets)} tweets.")
+    tweets = [l[tweets_column] for l in csvFile]
+print(f"Load {len(tweets)} tweets from column {tweets_column} on {tweets_file}.")
 
-# 0/ Launch vllm server
-cmd = "vllm serve HuggingFaceH4/zephyr-7b-beta --guided-decoding-backend=xgrammar --disable-log-stats --dtype=half &"
-os.system(cmd)
-print(f"Launched command:\n\t{cmd}")
+# 2/ Launch vllm server
+vllm_serve_command  = f"vllm serve {llm} --guided-decoding-backend={decoding} --disable-log-stats --dtype={dtype}"
+os.system(vllm_serve_command+" &")
+print(f"Launched vllm server with command:\n\t{vllm_serve_command}")
 
 # 4/ Wait for vllm server to be available and retrive model
 openai_api_key = "EMPTY"
@@ -74,42 +74,35 @@ while not model:
 print(f"Model is ready: {model} !")
 
 
-# 5/ Create async functions to request vllm server trought openAI api
-async def doCompletetion(model, messages, extra_body):
+# 3/ Create async functions to request vllm server trought openAI API
+async def doCompletetion(model, messages, extra_body, idx):
     completion = client.chat.completions.create(
         model=model,
         messages=messages,
         extra_body=extra_body)
     content = completion.choices[0].message.content
-    return content
+    return idx, content
 
-async def asyncMessageIterator(instructions, language):
-    for tweet in tweets:
-        yield [
+async def messageIterator():
+    for idx, tweet in enumerate(tweets):
+        yield idx, [
                     {
                         "role": "system",
-                        "content": system[language]
+                        "content": system_prompt
                     },
                     {
                         "role": "user",
-                        "content":  Template(instructions).substitute(tweet=tweet[language])
+                        "content":  Template(user_prompt).substitute(tweet=tweet)
                     }
                 ]
 
-label_extra_body = {
-    "guided_choice": guided_choice[language][experiment],
-    "temperature": 0.7,
-    "max_tokens": 16,
-    "top_k": 50,
-    "top_p": 0.95,
-    "repetition_penalty": 1.2,
-    }
+label_extra_body = sampling_params.update(){"guided_choice": guided_choice}
 
-async def run_all(instructions):
+async def run_all():
     # Asynchronously call the function for each prompt
     tasks = [
-        doCompletetion(model, messages, label_extra_body)
-        async for messages in asyncMessageIterator(instructions, language)
+        doCompletetion(model, messages, label_extra_body, idx)
+        async for idx, messages in messageIterator
     ]
     # Gather and run the tasks concurrently
     results = await asyncio.gather(*tasks)
@@ -117,15 +110,15 @@ async def run_all(instructions):
 
 # 6/ Run all courutines
 start = time.time()
-results = asyncio.run(run_all(instructions[language][experiment]))
+results = asyncio.run(run_all())
 end = time.time()
 print(f"Took {end - start} seconds.")
 
-headers = ["id", f"choice_{language}_{experiment}"]
+headers = ["id", f"choice"]
 with open(results_file, 'w') as f:
     writer =  csv.writer(f)
     writer.writerow(headers)
-    writer.writerows(enumerate(results))
+    writer.writerows(results)
 print(f"LLM answers (={len(results)}) saved to {results_file}.")
 
 
