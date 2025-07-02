@@ -109,7 +109,7 @@ async def doCompletetion(model, messages, extra_body, tweet):
     return tweet, completion.choices[0].message.content
 
 async def messageIterator():
-    for tweet in enumerate(tweets):
+    for tweet in tweets:
         yield tweet, [
                     {
                         "role": "system",
