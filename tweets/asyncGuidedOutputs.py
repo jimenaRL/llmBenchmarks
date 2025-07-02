@@ -80,8 +80,7 @@ async def doCompletetion(model, messages, extra_body, tweet):
         model=model,
         messages=messages,
         extra_body=extra_body)
-    content = completion.choices[0].message.content
-    return idx, content
+    return idx, completion.choices[0].message.content
 
 async def messageIterator():
     for tweet in enumerate(tweets):
@@ -102,7 +101,7 @@ async def run_all():
     # Asynchronously call the function for each prompt
     tasks = [
         doCompletetion(model, messages, label_extra_body, tweet)
-        async for tweet, messages in messageIterator
+        async for tweet, messages in messageIterator()
     ]
     # Gather and run the tasks concurrently
     results = await asyncio.gather(*tasks)
