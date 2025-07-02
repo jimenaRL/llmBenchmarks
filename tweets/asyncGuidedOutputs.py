@@ -96,7 +96,7 @@ async def messageIterator():
                     }
                 ]
 
-label_extra_body = sampling_params.update(){"guided_choice": guided_choice}
+label_extra_body = sampling_params.update({"guided_choice": guided_choice})
 
 async def run_all():
     # Asynchronously call the function for each prompt
