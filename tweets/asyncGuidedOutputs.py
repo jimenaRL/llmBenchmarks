@@ -75,7 +75,7 @@ print(f"Model is ready: {model} !")
 
 
 # 3/ Create async functions to request vllm server trought openAI API
-async def doCompletetion(model, messages, extra_body, idx):
+async def doCompletetion(model, messages, extra_body, tweet):
     completion = client.chat.completions.create(
         model=model,
         messages=messages,
@@ -84,8 +84,8 @@ async def doCompletetion(model, messages, extra_body, idx):
     return idx, content
 
 async def messageIterator():
-    for idx, tweet in enumerate(tweets):
-        yield idx, [
+    for tweet in enumerate(tweets):
+        yield tweet, [
                     {
                         "role": "system",
                         "content": system_prompt
@@ -101,8 +101,8 @@ label_extra_body = sampling_params.update(){"guided_choice": guided_choice}
 async def run_all():
     # Asynchronously call the function for each prompt
     tasks = [
-        doCompletetion(model, messages, label_extra_body, idx)
-        async for idx, messages in messageIterator
+        doCompletetion(model, messages, label_extra_body, tweet)
+        async for tweet, messages in messageIterator
     ]
     # Gather and run the tasks concurrently
     results = await asyncio.gather(*tasks)
@@ -114,7 +114,7 @@ results = asyncio.run(run_all())
 end = time.time()
 print(f"Took {end - start} seconds.")
 
-headers = ["id", f"choice"]
+headers = ["tweet", f"choice"]
 with open(results_file, 'w') as f:
     writer =  csv.writer(f)
     writer.writerow(headers)
