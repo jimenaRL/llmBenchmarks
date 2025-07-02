@@ -49,7 +49,11 @@ system_prompt = args.system_prompt
 user_prompt = args.user_prompt
 results_file = args.results_file
 
+#0/ Create dict parameter for openai requests
+extra_body = sampling_params.update({"guided_choice": guided_choice})
+
 parameters = vars(args)
+parameters = parameters.update({"extra_body": extra_body})
 parameters = json.dumps(parameters, sort_keys=True, indent=4)
 print(f"PARAMETERS:\n{parameters[2:-2]}")
 
@@ -70,9 +74,9 @@ vllm_serve_command  = f"""vllm serve {llm} \
     --seed={seed} \
     --gpu-memory-utilization={gpu_memory_utilization} \
     --disable-log-stats \
-    --disable-log-requests
+    --disable-log-requests &
 """
-os.system(vllm_serve_command+" &")
+os.system(vllm_serve_command)
 print(f"Launched vllm server with command:\n\t{vllm_serve_command}")
 
 # 4/ Wait for vllm server to be available and retrive model
@@ -112,8 +116,6 @@ async def messageIterator():
                         "content":  Template(user_prompt).substitute(tweet=tweet)
                     }
                 ]
-
-extra_body = sampling_params.update({"guided_choice": guided_choice})
 
 async def run_all():
     # Asynchronously call the function for each prompt
