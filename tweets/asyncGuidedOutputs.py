@@ -72,7 +72,6 @@ print(f"Load {len(tweets)} tweets from column {tweets_column} on {tweets_file}."
 # 2/ Launch vllm server
 # https://docs.redhat.com/en/documentation/red_hat_ai_inference_server/3.0/html/vllm_server_arguments/all-server-arguments-server-arguments
 vllm_serve_command = f"vllm serve {llm} "
-vllm_serve_command += f"--guided-decoding-backend={decoding} "
 vllm_serve_command += f"--max-model-len={max_model_len} "
 vllm_serve_command += f"--dtype={dtype} "
 vllm_serve_command += f"--seed={seed} "
