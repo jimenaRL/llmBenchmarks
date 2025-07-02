@@ -41,7 +41,7 @@ max_model_len = args.max_model_len
 gpu_memory_utilization = args.gpu_memory_utilization
 seed = args.seed
 decoding = args.guided_decoding_backend
-sampling_params = json.loads(args.sampling_params)
+extra_body = json.loads(args.sampling_params)
 guided_choice = args.guided_choice.split(',')
 tweets_file = args.tweets_file
 tweets_column = args.tweets_column
@@ -50,10 +50,10 @@ user_prompt = args.user_prompt
 results_file = args.results_file
 
 #0/ Create dict parameter for openai requests
-extra_body = sampling_params.update({"guided_choice": guided_choice})
+extra_body.update({"guided_choice": guided_choice})
 
 parameters = vars(args)
-parameters = parameters.update({"extra_body": extra_body})
+parameters.update({"extra_body": extra_body})
 parameters = json.dumps(parameters, sort_keys=True, indent=4)
 print(f"PARAMETERS:\n{parameters[2:-2]}")
 
@@ -98,6 +98,10 @@ print(f"Model is ready: {model} !")
 
 # 3/ Create async functions to request vllm server trought openAI API
 async def doCompletetion(model, messages, extra_body, tweet):
+    print("------------\n")
+    print(messages)
+    print(extra_body)
+    print(tweet)
     completion = client.chat.completions.create(
         model=model,
         messages=messages,
