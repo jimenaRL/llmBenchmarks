@@ -106,10 +106,6 @@ print(f"Model is ready: {model} !")
 
 # 3/ Create async functions to request vllm server trought openAI API
 async def doCompletetion(model, messages, extra_body, tweet):
-    print("------------\n")
-    print(messages)
-    print(extra_body)
-    print(tweet)
     completion = client.chat.completions.create(
         model=model,
         messages=messages,
