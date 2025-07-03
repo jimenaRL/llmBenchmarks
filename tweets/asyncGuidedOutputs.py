@@ -89,21 +89,21 @@ if run_model:
     print(f"Launched vllm server with command:\n\t{vllm_serve_command}")
     os.system(vllm_serve_command)
 
-    # 4/ Wait for vllm server to be available and retrive model
-    openai_api_key = "EMPTY"
-    openai_api_base = "http://localhost:8000/v1"
-    client = OpenAI(
-        base_url=openai_api_base,
-        api_key=openai_api_key)
+# 4/ Wait for vllm server to be available and retrive model
+openai_api_key = "EMPTY"
+openai_api_base = "http://localhost:8000/v1"
+client = OpenAI(
+    base_url=openai_api_base,
+    api_key=openai_api_key)
 
-    model = None
-    while not model:
-        try:
-            model = client.models.list().data[0].id
-        except Exception as e:
-            print(f"Model not ready: {e}")
-            sleep(30)
-    print(f"Model is ready: {model} !")
+model = None
+while not model:
+    try:
+        model = client.models.list().data[0].id
+    except Exception as e:
+        print(f"Model not ready: {e}")
+        sleep(30)
+print(f"Model is ready: {model} !")
 
 
 # 3/ Create async functions to request vllm server trought openAI API
