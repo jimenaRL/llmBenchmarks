@@ -27,7 +27,7 @@ ap.add_argument('--gpu_memory_utilization', required=False, type=float, default=
 ap.add_argument('--guided_decoding_backend', required=False, type=str, default=DEFAULTDECODING)
 ap.add_argument('--sampling_params', required=False, type=str, default=DEFAULTSAMPLINGPARAMS)
 ap.add_argument('--seed', required=False, type=int, default=DEFAULTSEED)
-ap.add_argument('--guided_choice', required=True, type=str)
+ap.add_argument('--guided_choice', required=False, type=str, default='')
 ap.add_argument('--system_prompt', required=True, type=str)
 ap.add_argument('--user_prompt', required=True, type=str)
 ap.add_argument('--tweets_file', required=True, type=str)
@@ -56,7 +56,8 @@ disable_log_stats = args.disable_log_stats
 disable_log_requests = args.disable_log_requests
 
 #0/ Create dict parameter for openai requests
-extra_body.update({"guided_choice": guided_choice})
+if guided_choice:
+    extra_body.update({"guided_choice": guided_choice})
 
 parameters = vars(args)
 parameters.update({"extra_body": extra_body})
