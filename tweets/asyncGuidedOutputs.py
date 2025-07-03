@@ -113,11 +113,7 @@ async def doCompletetion(model, messages, extra_body, tweet):
         model=model,
         messages=messages,
         extra_body=extra_body)
-    if guided_choice:
-        res = completion.choices[0].message.content
-    else:
-        res = completion.outputs[0].text
-    return tweet, res
+    return tweet, completion.choices[0].message.content
 
 async def messageIterator():
     for tweet in tweets:
