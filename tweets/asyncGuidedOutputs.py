@@ -33,6 +33,7 @@ ap.add_argument('--user_prompt', required=True, type=str)
 ap.add_argument('--tweets_file', required=True, type=str)
 ap.add_argument('--tweets_column', required=True, type=str)
 ap.add_argument('--results_file', required=True, type=str)
+ap.add_argument('--run_model', required=False, action='store_true')
 ap.add_argument('--disable_log_stats', required=False, action='store_true')
 ap.add_argument('--disable_log_requests', required=False, action='store_true')
 
@@ -50,6 +51,7 @@ tweets_column = args.tweets_column
 system_prompt = args.system_prompt
 user_prompt = args.user_prompt
 results_file = args.results_file
+run_model = args.run_model
 disable_log_stats = args.disable_log_stats
 disable_log_requests = args.disable_log_requests
 
@@ -71,36 +73,37 @@ print(f"Load {len(tweets)} tweets from column {tweets_column} on {tweets_file}."
 
 # 2/ Launch vllm server
 # https://docs.redhat.com/en/documentation/red_hat_ai_inference_server/3.0/html/vllm_server_arguments/all-server-arguments-server-arguments
-vllm_serve_command = f"vllm serve {llm} "
-vllm_serve_command += f"--max-model-len={max_model_len} "
-vllm_serve_command += f"--dtype={dtype} "
-vllm_serve_command += f"--seed={seed} "
-vllm_serve_command += f"--guided-decoding-backend={decoding} "
-vllm_serve_command += f"--gpu-memory-utilization={gpu_memory_utilization} "
-if disable_log_stats:
-    vllm_serve_command += "--disable-log-stats "
-if disable_log_requests:
-    vllm_serve_command += "--disable-log-requests "
-vllm_serve_command += "&"
+if run_model:
+    vllm_serve_command = f"vllm serve {llm} "
+    vllm_serve_command += f"--max-model-len={max_model_len} "
+    vllm_serve_command += f"--dtype={dtype} "
+    vllm_serve_command += f"--seed={seed} "
+    vllm_serve_command += f"--guided-decoding-backend={decoding} "
+    vllm_serve_command += f"--gpu-memory-utilization={gpu_memory_utilization} "
+    if disable_log_stats:
+        vllm_serve_command += "--disable-log-stats "
+    if disable_log_requests:
+        vllm_serve_command += "--disable-log-requests "
+    vllm_serve_command += "&"
 
-print(f"Launched vllm server with command:\n\t{vllm_serve_command}")
-os.system(vllm_serve_command)
+    print(f"Launched vllm server with command:\n\t{vllm_serve_command}")
+    os.system(vllm_serve_command)
 
-# 4/ Wait for vllm server to be available and retrive model
-openai_api_key = "EMPTY"
-openai_api_base = "http://localhost:8000/v1"
-client = OpenAI(
-    base_url=openai_api_base,
-    api_key=openai_api_key)
+    # 4/ Wait for vllm server to be available and retrive model
+    openai_api_key = "EMPTY"
+    openai_api_base = "http://localhost:8000/v1"
+    client = OpenAI(
+        base_url=openai_api_base,
+        api_key=openai_api_key)
 
-model = None
-while not model:
-    try:
-        model = client.models.list().data[0].id
-    except Exception as e:
-        print(f"Model not ready: {e}")
-        sleep(30)
-print(f"Model is ready: {model} !")
+    model = None
+    while not model:
+        try:
+            model = client.models.list().data[0].id
+        except Exception as e:
+            print(f"Model not ready: {e}")
+            sleep(30)
+    print(f"Model is ready: {model} !")
 
 
 # 3/ Create async functions to request vllm server trought openAI API
