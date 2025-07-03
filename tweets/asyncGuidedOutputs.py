@@ -144,7 +144,7 @@ results = asyncio.run(run_all())
 end = time.time()
 print(f"Took {end - start} seconds.")
 
-headers = ["tweet", f"choice"]
+headers = ["tweet", f"response"]
 with open(results_file, 'w') as f:
     writer =  csv.writer(f)
     writer.writerow(headers)
