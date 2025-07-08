@@ -6,3 +6,4 @@ outs
 vllm
 *.log
 jean-zay/data
+.ipynb_checkpoints
