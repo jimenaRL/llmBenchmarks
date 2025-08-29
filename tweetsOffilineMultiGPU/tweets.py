@@ -15,7 +15,7 @@ from vllm.sampling_params import GuidedDecodingParams
 DEFAULTOUTFOLDER = "/home/jimena.royoletelier/storage/toErase"
 DEFAULTLOGFILE = os.path.join(DEFAULTOUTFOLDER, "test_tweets.log")
 DEFAULTBATCHSIZE = 5000
-DEFAULTMODELPARAMS = '{"model": "HuggingFaceH4/zephyr-7b-beta", "guided_decoding_backend": "xgrammar", "seed": 19, "dtype": "half", "max_model_len": 21500, "gpu_memory_utilization": 0.9, "tensor_parallel_size": 2}'
+DEFAULTMODELPARAMS = '{"model": "HuggingFaceH4/zephyr-7b-beta", "guided_decoding_backend": "xgrammar", "seed": 19, "dtype": "half", "max_model_len": 21500, "gpu_memory_utilization": 0.9, "tensor_parallel_size": 1}'
 DEFAULTSAMPLEPARAMS = '{"temperature": 0.7, "top_p": 0.95, "top_k": 50, "max_tokens": 16, "repetition_penalty": 1.2, "seed": 19}'
 
 
@@ -148,13 +148,20 @@ def compute_llm_asnwers(data, model, sampling_params, system_prompt, user_prompt
 if __name__ == "__main__":
 
     """
+    Example of script calling using 2 V100 gpu cards.
+    V100 doesn't support the original model's dtype BF16, so we downcast to 'half' which means FP16.
+    Deepseek recommends to avoid adding a system prompt; all instructions should be contained within the user prompt.
+
      python tweets.py \
+        --model_params='{"model": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B", "guided_decoding_backend": "xgrammar", "seed": 19, "dtype": "half", "gpu_memory_utilization": 0.9, "tensor_parallel_size": 2}' \
+        --sampling_params='{"temperature": 0.6, "top_p": 0.95}' \
         --tweets_file=200_sampled_xan_seed_123_fr_en.csv \
         --tweets_column=english \
-        --system_prompt='You are an expert in French politics.' \
-        --user_prompt='Please classify the following social media message (that were posted in the weeks leading up to the 2022 presidential election in France) according to whether it express support or positive attitudes towards Le Pen in this election. You must use only the information contained in the message. Be concise and answer only “YES” or “NO”. Here is the message: “${tweet}“' \
-        --guided_choice=YES,NO
-        --outfolder=.
+        --system_prompt='' \
+        --user_prompt='You are an expert in French politics. Please classify the following social media message (that were posted in the weeks leading up to the 2022 presidential election in France) according to whether it express support or positive attitudes towards Le Pen in this election. You must use only the information contained in the message. Be concise and answer only YES or NO. Here is the message: ${tweet}' \
+        --guided_choice=YES,NO \
+        --logfile=/sps/humanum/user/jroyolet/dev/llmBenchmarks/tweetsOffilineMultiGPU/logs/2Xv100DeepSeek-R1-Distill-Qwen-32B.log \
+        --outfolder=/sps/humanum/user/jroyolet/dev/llmBenchmarks/tweetsOffilineMultiGPU/2Xv100DeepSeek-R1-Distill-Qwen-32B/
     """
 
     ap = ArgumentParser()
@@ -206,10 +213,13 @@ if __name__ == "__main__":
     print(f"Load {len(tweets)} tweets from column {tweets_column} on {tweets_file}.")
 
     # 3/ Set sampling params
-    guided_decoding_params = GuidedDecodingParams(choice=guided_choice)
-    sp = SamplingParams(
-        **sampling_params,
-        guided_decoding=guided_decoding_params)
+    if guided_choice:
+        guided_decoding_params = GuidedDecodingParams(choice=guided_choice)
+        sp = SamplingParams(
+            **sampling_params,
+            guided_decoding=guided_decoding_params)
+    else:
+        sp = SamplingParams(**sampling_params)
     logger.info(f"LLM model was loaded. Sampling params are {sp}.")
 
     # 4/ Load model
