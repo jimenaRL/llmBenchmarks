@@ -13,7 +13,6 @@ from vllm import LLM, SamplingParams
 from vllm.sampling_params import GuidedDecodingParams
 
 DEFAULTOUTFOLDER = "/home/jimena.royoletelier/storage/toErase"
-DEFAULTLOGFILE = os.path.join(DEFAULTOUTFOLDER, "test_tweets.log")
 DEFAULTBATCHSIZE = 5000
 DEFAULTMODELPARAMS = '{"model": "HuggingFaceH4/zephyr-7b-beta", "guided_decoding_backend": "xgrammar", "seed": 19, "dtype": "half", "max_model_len": 21500, "gpu_memory_utilization": 0.9, "tensor_parallel_size": 1}'
 DEFAULTSAMPLEPARAMS = '{"temperature": 0.7, "top_p": 0.95, "top_k": 50, "max_tokens": 16, "repetition_penalty": 1.2, "seed": 19}'
@@ -149,7 +148,6 @@ if __name__ == "__main__":
 
     """
     Example of script calling using 2 V100 gpu cards.
-    V100 doesn't support the original model's dtype BF16, so we downcast to 'half' which means FP16.
     Deepseek recommends to avoid adding a system prompt; all instructions should be contained within the user prompt.
 
      python tweets.py \
@@ -176,7 +174,7 @@ if __name__ == "__main__":
     ap.add_argument('--tweets_file', required=True, type=str)
     ap.add_argument('--tweets_column', required=True, type=str)
 
-    ap.add_argument('--logfile', type=str, default=DEFAULTLOGFILE)
+    ap.add_argument('--logfile', type=str, default=None)
     ap.add_argument('--outfolder', type=str, default=DEFAULTOUTFOLDER)
 
     args = ap.parse_args()
@@ -192,7 +190,9 @@ if __name__ == "__main__":
     tweets_column = args.tweets_column
 
     outfolder = args.outfolder
-    logfile = args.logfile
+    logfile = args.logfile if args.logfile is not None else os.path.join(outfolder, "out.log")
+
+    os.makedirs(outfolder, exist_ok=True)
 
     # 1/ Make logger and log parameters
     logger = make_logger(logfile)
@@ -201,8 +201,6 @@ if __name__ == "__main__":
     dumped_parameters = json.dumps(parameters, sort_keys=True, indent=4)
     logger.info("---------------------------------------------------------")
     logger.info(f"PARAMETERS:\n{dumped_parameters[2:-2]}")
-
-    os.makedirs(outfolder, exist_ok=True)
 
     # 2/ Load data (tweets) to be used in prompts
     if not os.path.exists(tweets_file):
