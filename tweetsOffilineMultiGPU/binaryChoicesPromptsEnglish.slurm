@@ -54,34 +54,9 @@ cmd="python ${BASEPATH}/tweets.py \
        --tweets_file=${BASEPATH}/200_sampled_xan_seed_123_fr_en.csv \
        --tweets_column=english \
        --system_prompt='' \
-       --user_prompt='You are an expert in French politics. Please classify the following social media message (that was posted in the weeks leading up to the 2022 presidential election in France) according to whether it express the intention to vote for the intention to vote for or calls for a vote for Macron, Mélenchon or Le Pen. You must use only the information contained in the message. Be concise and answer only only with the last name of the candidate, or with None, if the message does not show support for any of these three candidates. Here is the message: \${tweet}' \
-       --guided_choice='Macron,Mélenchon,Le Pen,None' \
-       --outfolder=${OUTFOLDER}/voteintention/all"
-echo "[RUNNING] ${cmd}"
-eval "$cmd"
-
-
-cmd="python ${BASEPATH}/tweets.py \
-       --model_params=${MODELPARAMS} \
-       --sampling_params=${SAMPLINGPARAMS} \
-       --tweets_file=${BASEPATH}/200_sampled_xan_seed_123_fr_en.csv \
-       --tweets_column=english \
-       --system_prompt='' \
-       --user_prompt='You are an expert in French politics. Please classify the following social media message (that was posted in the weeks leading up to the 2022 presidential election in France) according to whether it express support for Macron, Mélenchon or Le Pen, by replying only with last name of the candidate, or with the word Other, if the message does not express an intention to vote or calls for a vote for one of these three candidates. You must use only the information contained in the message. Be concise. Here is the message: \${tweet}' \
-       --guided_choice='Macron,Mélenchon,Le Pen,Other' \
-       --outfolder=${OUTFOLDER}/support/all"
-echo "[RUNNING] ${cmd}"
-eval "$cmd"
-
-cmd="python ${BASEPATH}/tweets.py \
-       --model_params=${MODELPARAMS} \
-       --sampling_params=${SAMPLINGPARAMS} \
-       --tweets_file=${BASEPATH}/200_sampled_xan_seed_123_fr_en.csv \
-       --tweets_column=english \
-       --system_prompt='' \
        --user_prompt='You are an expert in French politics. Please classify the following social media message (that was posted in the weeks leading up to the 2022 presidential election in France) according to whether it express criticism or negative attitudes towards Macron in this election. You must use only the information contained in the message. Be concise and answer only YES or NO. Here is the message: \${tweet}' \
        --guided_choice=${CHOICES} \
-       --outfolder=${OUTFOLDER}/criticism/macron"
+       --outfolder=${OUTFOLDER}/criticism/binary/macron"
 echo "[RUNNING] ${cmd}"
 eval "$cmd"
 
@@ -94,7 +69,7 @@ cmd="python ${BASEPATH}/tweets.py \
        --system_prompt='' \
        --user_prompt='You are an expert in French politics. Please classify the following social media message (that was posted in the weeks leading up to the 2022 presidential election in France) according to whether it express criticism or negative attitudes towards Le Pen in this election. You must use only the information contained in the message. Be concise and answer only YES or NO. Here is the message: \${tweet}' \
        --guided_choice=${CHOICES} \
-       --outfolder=${OUTFOLDER}/criticism/lepen"
+       --outfolder=${OUTFOLDER}/criticism/binary/lepen"
 echo "[RUNNING] ${cmd}"
 eval "$cmd"
 
@@ -107,7 +82,7 @@ cmd="python ${BASEPATH}/tweets.py \
        --system_prompt='' \
        --user_prompt='You are an expert in French politics. Please classify the following social media message (that was posted in the weeks leading up to the 2022 presidential election in France) according to whether it express criticism or negative attitudes towards Mélenchon in this election. You must use only the information contained in the message. Be concise and answer only YES or NO. Here is the message: \${tweet}' \
        --guided_choice=${CHOICES} \
-       --outfolder=${OUTFOLDER}/criticism/melenchon"
+       --outfolder=${OUTFOLDER}/criticism/binary/melenchon"
 echo "[RUNNING] ${cmd}"
 eval "$cmd"
 
@@ -122,7 +97,7 @@ cmd="python ${BASEPATH}/tweets.py \
        --system_prompt='' \
        --user_prompt='You are an expert in French politics. Please classify the following social media message (that was posted in the weeks leading up to the 2022 presidential election in France) according to whether it express support or positive attitudes towards Macron in this election. You must use only the information contained in the message. Be concise and answer only YES or NO. Here is the message: \${tweet}' \
        --guided_choice=${CHOICES} \
-       --outfolder=${OUTFOLDER}/support/macron"
+       --outfolder=${OUTFOLDER}/support/binary/macron"
 echo "[RUNNING] ${cmd}"
 eval "$cmd"
 
@@ -135,7 +110,7 @@ cmd="python ${BASEPATH}/tweets.py \
        --system_prompt='' \
        --user_prompt='You are an expert in French politics. Please classify the following social media message (that was posted in the weeks leading up to the 2022 presidential election in France) according to whether it express support or positive attitudes towards Le Pen in this election. You must use only the information contained in the message. Be concise and answer only YES or NO. Here is the message: \${tweet}' \
        --guided_choice=${CHOICES} \
-       --outfolder=${OUTFOLDER}/support/lepen"
+       --outfolder=${OUTFOLDER}/support/binary/lepen"
 echo "[RUNNING] ${cmd}"
 eval "$cmd"
 
@@ -148,7 +123,7 @@ cmd="python ${BASEPATH}/tweets.py \
        --system_prompt='' \
        --user_prompt='You are an expert in French politics. Please classify the following social media message (that was posted in the weeks leading up to the 2022 presidential election in France) according to whether it express support or positive attitudes towards Mélenchon in this election. You must use only the information contained in the message. Be concise and answer only YES or NO. Here is the message: \${tweet}' \
        --guided_choice=${CHOICES} \
-       --outfolder=${OUTFOLDER}/support/melenchon"
+       --outfolder=${OUTFOLDER}/support/binary/melenchon"
 echo "[RUNNING] ${cmd}"
 eval "$cmd"
 
@@ -161,7 +136,7 @@ cmd="python ${BASEPATH}/tweets.py \
        --system_prompt='' \
        --user_prompt='You are an expert in French politics. Please classify the following social media message (that was posted in the weeks leading up to the 2022 presidential election in France) according to whether it express the intention to vote for Macron in this election. You must use only the information contained in the message. Be concise and answer only YES or NO. Here is the message: \${tweet}' \
        --guided_choice=${CHOICES} \
-       --outfolder=${OUTFOLDER}/voteintention/macron"
+       --outfolder=${OUTFOLDER}/voteintention/binary/macron"
 echo "[RUNNING] ${cmd}"
 eval "$cmd"
 
@@ -174,7 +149,7 @@ cmd="python ${BASEPATH}/tweets.py \
        --system_prompt='' \
        --user_prompt='You are an expert in French politics. Please classify the following social media message (that was posted in the weeks leading up to the 2022 presidential election in France) according to whether it express the intention to vote for Le Pen in this election. You must use only the information contained in the message. Be concise and answer only YES or NO. Here is the message: \${tweet}' \
        --guided_choice=${CHOICES} \
-       --outfolder=${OUTFOLDER}/voteintention/lepen"
+       --outfolder=${OUTFOLDER}/voteintention/binary/lepen"
 echo "[RUNNING] ${cmd}"
 eval "$cmd"
 
@@ -187,6 +162,6 @@ cmd="python ${BASEPATH}/tweets.py \
        --system_prompt='' \
        --user_prompt='You are an expert in French politics. Please classify the following social media message (that was posted in the weeks leading up to the 2022 presidential election in France) according to whether it express the intention to vote for Mélenchon in this election. You must use only the information contained in the message. Be concise and answer only YES or NO. Here is the message: \${tweet}' \
        --guided_choice=${CHOICES} \
-       --outfolder=${OUTFOLDER}/voteintention/melenchon"
+       --outfolder=${OUTFOLDER}/voteintention/binary/melenchon"
 echo "[RUNNING] ${cmd}"
 eval "$cmd"
