@@ -389,3 +389,56 @@ sbatch \
     --gres=gpu:h100:2 \
     --export=ALL \
     multipleChoicesPromptsEnglish.slurm
+
+
+-------------------------------------------------------------------------------
+export MODELPARAMS="'{\"model\": \"mistralai/Mistral-Large-Instruct-2411\", \"tokenizer_mode\": \"mistral\", \"config_format\": \"mistral\", \"load_format\": \"mistral\", \"guided_decoding_backend\": \"xgrammar\", \"seed\": 119, \"tensor_parallel_size\": 4}'"
+export SAMPLINGPARAMS="'{\"temperature\": 0.15, \"seed\": 19, \"max_tokens\": 256}'"
+export CHOICES="'YES,NO'"
+export OUTFOLDER=4xH100_Mistral-Large-Instruct-2411/guided
+sbatch \
+    --job-name=${OUTFOLDER} \
+    --output=$(pwd)/${OUTFOLDER}/%j.log  \
+    --gres=gpu:h100:4 \
+    --export=ALL \
+    binaryChoicesPromptsEnglish.slurm
+
+export MODELPARAMS="'{\"model\": \"mistralai/Mistral-Large-Instruct-2411\", \"tokenizer_mode\": \"mistral\", \"config_format\": \"mistral\", \"load_format\": \"mistral\", \"guided_decoding_backend\": \"xgrammar\", \"seed\": 119, \"tensor_parallel_size\": 4}'"
+export SAMPLINGPARAMS="'{\"temperature\": 0.15, \"seed\": 19, \"max_tokens\": 256}'"
+export CHOICES="'Macron,Mélenchon,Le Pen,None'"
+export OUTFOLDER=4xH100_Mistral-Large-Instruct-2411/guided
+sbatch \
+    --job-name=${OUTFOLDER} \
+    --output=$(pwd)/${OUTFOLDER}/%j.log  \
+    --gres=gpu:h100:4 \
+    --export=ALL \
+    multipleChoicesPromptsEnglish.slurm
+
+
+export MODELPARAMS="'{\"model\": \"mistralai/Mistral-Large-Instruct-2411\", \"tokenizer_mode\": \"mistral\", \"config_format\": \"mistral\", \"load_format\": \"mistral\", \"guided_decoding_backend\": \"xgrammar\", \"seed\": 119, \"tensor_parallel_size\": 4}'"
+export SAMPLINGPARAMS="'{\"temperature\": 0.15, \"seed\": 19, \"max_tokens\": 256}'"
+export CHOICES="''"
+export OUTFOLDER=4xH100_Mistral-Large-Instruct-2411/free
+sbatch \
+    --job-name=${OUTFOLDER} \
+    --output=$(pwd)/${OUTFOLDER}/%j.log  \
+    --gres=gpu:h100:4 \
+    --export=ALL \
+    binaryChoicesPromptsEnglish.slurm
+
+
+export MODELPARAMS="'{\"model\": \"mistralai/Mistral-Large-Instruct-2411\", \"tokenizer_mode\": \"mistral\", \"config_format\": \"mistral\", \"load_format\": \"mistral\", \"guided_decoding_backend\": \"xgrammar\", \"seed\": 119, \"tensor_parallel_size\": 4}'"
+export SAMPLINGPARAMS="'{\"temperature\": 0.15, \"seed\": 19, \"max_tokens\": 256}'"
+export CHOICES="''"
+export OUTFOLDER=4xH100_Mistral-Large-Instruct-2411/free
+sbatch \
+    --job-name=${OUTFOLDER} \
+    --output=$(pwd)/${OUTFOLDER}/%j.log  \
+    --gres=gpu:h100:4 \
+    --export=ALL \
+    multipleChoicesPromptsEnglish.slurm
+
+
+
+-------------------------------------------------------------------------------
+
