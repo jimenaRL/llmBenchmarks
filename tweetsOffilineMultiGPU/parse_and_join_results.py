@@ -5,8 +5,6 @@ import  pandas as pd
 # BASEPATH = "/sps/humanum/user/jroyolet/dev/llmBenchmarks/tweetsOffilineMultiGPU"
 BASEPATH = "/home/jimena/work/dev/llmBenchmarks/tweetsOffilineMultiGPU"
 
-# folders = glob(os.path.join(BASEPATH, "1xH100*")) + glob(os.path.join(BASEPATH, "2xH100*"))
-
 models = [
     "zephyr-7b-beta",
     "gpt-oss-20b",
@@ -17,6 +15,7 @@ models = [
     "gpt-oss-120b",
     "Llama-3.3-70B-Instruct",
     "DeepSeek-R1-Distill-Llama-70B",
+    "Mistral-Large-Instruct-2411"
 ]
 
 
@@ -28,8 +27,6 @@ def extract_data(model, annotation, df=None, columns=[]):
 
     path_free = os.path.join(folder, "free", annotation, "llm_answer_0.csv")
     df_free = pd.read_csv(path_free)
-    if "gpt-oss" in model:
-        df_free["answer"] = df_free["answer"].apply(lambda s: s.split("assistantfinal")[-1])
     df_free = df_free.rename(columns={"answer": "FREE-" + model})
 
     if df is not None:
@@ -51,20 +48,21 @@ def extract_data(model, annotation, df=None, columns=[]):
 
 annotations = [
     "voteintention/multiple/all",
-    "support/multiple/all"
+    "support/multiple/all",
+    "criticism/multiple/all"
 ]
 
-# annotations = [
-    # "criticism/binary/lepen",
-    # "criticism/binary/macron",
-    # "criticism/binary/melenchon",
-    # "support/binary/lepen",
-    # "support/binary/macron",
-    # "support/binary/melenchon",
-    # "voteintention/binary/lepen",
-    # "voteintention/binary/macron",
-    # "voteintention/binary/melenchon",
-# ]
+annotations = [
+    "criticism/binary/lepen",
+    "criticism/binary/macron",
+    "criticism/binary/melenchon",
+    "support/binary/lepen",
+    "support/binary/macron",
+    "support/binary/melenchon",
+    "voteintention/binary/lepen",
+    "voteintention/binary/macron",
+    "voteintention/binary/melenchon",
+]
 
 for annotation in annotations:
 
@@ -77,7 +75,6 @@ for annotation in annotations:
         except Exception as exc:
             print(exc)
             print("Continuing...")
-            pass
 
     df = df.fillna("None")
 
