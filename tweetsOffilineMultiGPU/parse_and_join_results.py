@@ -6,16 +6,16 @@ import  pandas as pd
 BASEPATH = "/home/jimena/work/dev/llmBenchmarks/tweetsOffilineMultiGPU"
 
 MODELS = [
-    "zephyr-7b-beta",
-    "gpt-oss-20b",
-    "Mistral-Small-3.1-24B-Instruct-2503",
-    "Magistral-Small-2506",
-    "Mistral-Small-24B-Instruct-2501",
-    "max_model_len_8000_Qwen3-30B-A3B-Instruct-2507",
+    # "zephyr-7b-beta",
+    # "gpt-oss-20b",
+    # "Mistral-Small-3.1-24B-Instruct-2503",
+    # "Magistral-Small-2506",
+    # "Mistral-Small-24B-Instruct-2501",
+    # "max_model_len_8000_Qwen3-30B-A3B-Instruct-2507",
     "gpt-oss-120b",
-    "Llama-3.3-70B-Instruct",
-    "DeepSeek-R1-Distill-Llama-70B",
-    "Mistral-Large-Instruct-2411"
+    # "Llama-3.3-70B-Instruct",
+    # "DeepSeek-R1-Distill-Llama-70B",
+    # "Mistral-Large-Instruct-2411"
 ]
 
 ANNOTATIONS = {
@@ -79,7 +79,6 @@ def extract_data(model, annotation, setting, df=None, columns=[]):
     folders = glob(os.path.join(BASEPATH, "outputs/v1", f"*{model}*"))
     assert len(folders) == 1
     folder = folders[0]
-    # print(f"Reading results for model {model} at {folder}")
 
     # get free answers
     colname = "FREE-" + model
@@ -99,11 +98,12 @@ def extract_data(model, annotation, setting, df=None, columns=[]):
     df_guided = pd.read_csv(path_guided) \
         .fillna("None") \
         .rename(columns={"answer": colname})
-    df_guided[colname] = df_guided[colname].apply(lambda a: parseAnwers(a, setting))
 
     if "gpt-oss" in model:
         df_guided[colname] = df_guided[colname] \
             .apply(lambda s: s.split("assistantfinal")[-1])
+
+    df_guided[colname] = df_guided[colname].apply(lambda a: parseAnwers(a, setting))
 
     df = df.merge(df_guided, on=['idx', 'tweet'])
 
