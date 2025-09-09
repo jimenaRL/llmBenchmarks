@@ -45,8 +45,7 @@ sbatch \
     --export=ALL \
     multipleChoicesPromptsEnglish_v2.slurm
 
-
---------------------------------------------------------------------------------
+################################################################################
 
 export MODELPARAMS="'{\"model\": \"openai/gpt-oss-120b\", \"guided_decoding_backend\": \"xgrammar\", \"seed\": 19}'"
 export SAMPLINGPARAMS="'{\"seed\": 19, \"max_tokens\": 256}'"
@@ -95,10 +94,7 @@ sbatch \
     --export=ALL \
     multipleChoicesPromptsEnglish_v2.slurm
 
-
-
-
--------------------------------------------------------------------------------
+################################################################################
 
 export MODELPARAMS="'{\"model\": \"Qwen/Qwen3-30B-A3B-Instruct-2507\", \"guided_decoding_backend\": \"xgrammar\", \"seed\": 119, \"max_model_len\": 8000, \"tensor_parallel_size\": 1}'"
 export SAMPLINGPARAMS="'{\"temperature\": 0.7, \"min_p\": 0, \"top_p\": 0.8, \"top_k\": 20, \"seed\": 19, \"max_tokens\": 256}'"
@@ -147,7 +143,7 @@ sbatch \
     multipleChoicesPromptsEnglish_v2.slurm
 
 
--------------------------------------------------------------------------------
+################################################################################
 
 export MODELPARAMS="'{\"model\": \"meta-llama/Llama-3.3-70B-Instruct\", \"guided_decoding_backend\": \"xgrammar\", \"max_model_len\": 7000, \"seed\": 119, \"tensor_parallel_size\": 2}'"
 export SAMPLINGPARAMS="'{\"seed\": 19, \"max_tokens\": 256}'"
@@ -196,7 +192,8 @@ sbatch \
     multipleChoicesPromptsEnglish_v2.slurm
 
 
--------------------------------------------------------------------------------
+################################################################################
+
 export MODELPARAMS="'{\"model\": \"mistralai/Mistral-Large-Instruct-2411\", \"tokenizer_mode\": \"mistral\", \"config_format\": \"mistral\", \"load_format\": \"mistral\", \"guided_decoding_backend\": \"xgrammar\", \"seed\": 119, \"tensor_parallel_size\": 4}'"
 export SAMPLINGPARAMS="'{\"temperature\": 0.15, \"seed\": 19, \"max_tokens\": 256}'"
 export CHOICES="'YES,NO'"

@@ -136,7 +136,7 @@ cmd="python ${BASEPATH}/tweets.py \
        --tweets_file=${BASEPATH}/200_sampled_xan_seed_123_fr_en.csv \
        --tweets_column=english \
        --system_prompt='' \
-       --user_prompt='You are an expert in French politics. Please classify the following social media message (that was posted in the weeks leading up to the 2022 presidential election in France) according to whether it explicitly express the intention to vote for Macron in this election. You should base your answer solely on the information contained in the message. Do not assume that a message containing only positive opinions about Macron explicitly expresses an intention to vote for Macron. Do not assume that a message that corresponds to political opinions or positions of Macron necessarily expresses the explicit intention to vote for Macron. Be concise and answer only YES or NO. Here is the message: \${tweet}' \
+       --user_prompt='You are an expert in French politics. Please classify the following social media message (that was posted in the weeks leading up to the 2022 presidential election in France) according to whether it explicitly express the intention to vote for Macron in this election. You should base your answer solely on the information contained in the message. Do not assume that a message containing only positive opinions about Macron explicitly expresses an intention to vote for Macron. Do not assume that a message that corresponds to political opinions or positions of Macron necessarily expresses an intention to vote for Macron. Be concise and answer only YES or NO. Here is the message: \${tweet}' \
        --guided_choice=${CHOICES} \
        --outfolder=${OUTFOLDER}/voteintention/binary/macron"
 echo "[RUNNING] ${cmd}"
@@ -149,7 +149,7 @@ cmd="python ${BASEPATH}/tweets.py \
        --tweets_file=${BASEPATH}/200_sampled_xan_seed_123_fr_en.csv \
        --tweets_column=english \
        --system_prompt='' \
-       --user_prompt='You are an expert in French politics. Please classify the following social media message (that was posted in the weeks leading up to the 2022 presidential election in France) according to whether it explicitly express the intention to vote for Le Pen in this election. You should base your answer solely on the information contained in the message. Do not assume that a message containing only positive opinions about Le Pen explicitly expresses an intention to vote for Le Pen. Do not assume that a message that corresponds to political opinions or positions Le Pen necessarily expresses the explicit intention to vote for Le Pen. Be concise and answer only YES or NO. Here is the message: \${tweet}' \
+       --user_prompt='You are an expert in French politics. Please classify the following social media message (that was posted in the weeks leading up to the 2022 presidential election in France) according to whether it explicitly express the intention to vote for Le Pen in this election. You should base your answer solely on the information contained in the message. Do not assume that a message containing only positive opinions about Le Pen explicitly expresses an intention to vote for Le Pen. Do not assume that a message that corresponds to political opinions or positions Le Pen necessarily expresses an intention to vote for Le Pen. Be concise and answer only YES or NO. Here is the message: \${tweet}' \
        --guided_choice=${CHOICES} \
        --outfolder=${OUTFOLDER}/voteintention/binary/lepen"
 echo "[RUNNING] ${cmd}"
@@ -162,7 +162,7 @@ cmd="python ${BASEPATH}/tweets.py \
        --tweets_file=${BASEPATH}/200_sampled_xan_seed_123_fr_en.csv \
        --tweets_column=english \
        --system_prompt='' \
-       --user_prompt='You are an expert in French politics. Please classify the following social media message (that was posted in the weeks leading up to the 2022 presidential election in France) according to whether it explicitly express the intention to vote for Mélenchon in this election. You should base your answer solely on the information contained in the message. Do not assume that a message containing only positive opinions about Mélenchon explicitly expresses an intention to vote for Mélenchon. Do not assume that a message that corresponds to political opinions or positions Mélenchon necessarily expresses the explicit intention to vote for Mélenchon. Be concise and answer only YES or NO. Here is the message: \${tweet}' \
+       --user_prompt='You are an expert in French politics. Please classify the following social media message (that was posted in the weeks leading up to the 2022 presidential election in France) according to whether it explicitly express the intention to vote for Mélenchon in this election. You should base your answer solely on the information contained in the message. Do not assume that a message containing only positive opinions about Mélenchon explicitly expresses an intention to vote for Mélenchon. Do not assume that a message that corresponds to political opinions or positions Mélenchon necessarily expresses an intention to vote for Mélenchon. Be concise and answer only YES or NO. Here is the message: \${tweet}' \
        --guided_choice=${CHOICES} \
        --outfolder=${OUTFOLDER}/voteintention/binary/melenchon"
 echo "[RUNNING] ${cmd}"
