@@ -4,26 +4,41 @@ import  pandas as pd
 
 # BASEPATH = "/sps/humanum/user/jroyolet/dev/llmBenchmarks/tweetsOffilineMultiGPU"
 BASEPATH = "/home/jimena/work/dev/llmBenchmarks/tweetsOffilineMultiGPU"
+VERSION = "v2"
+OUTPUTSFOLDER = os.path.join(BASEPATH, "models_outputs", VERSION)
+RESULTSFOLDER = os.path.join(BASEPATH, "joint_results", VERSION)
+os.makedirs(RESULTSFOLDER, exist_ok=True)
 
-MODELS = [
-    # "zephyr-7b-beta",
-    # "gpt-oss-20b",
-    # "Mistral-Small-3.1-24B-Instruct-2503",
-    # "Magistral-Small-2506",
-    # "Mistral-Small-24B-Instruct-2501",
-    # "max_model_len_8000_Qwen3-30B-A3B-Instruct-2507",
-    "gpt-oss-120b",
-    # "Llama-3.3-70B-Instruct",
-    # "DeepSeek-R1-Distill-Llama-70B",
-    # "Mistral-Large-Instruct-2411"
-]
+MODELS = {
+    "v1": [
+        "zephyr-7b-beta",
+        "gpt-oss-20b",
+        "Mistral-Small-3.1-24B-Instruct-2503",
+        "Magistral-Small-2506",
+        "Mistral-Small-24B-Instruct-2501",
+        "max_model_len_8000_Qwen3-30B-A3B-Instruct-2507",
+        "gpt-oss-120b",
+        "Llama-3.3-70B-Instruct",
+        "max_model_len_7000_Llama-3.3-70B-Instruct",
+        "DeepSeek-R1-Distill-Llama-70B",
+        "Mistral-Large-Instruct-2411"
+    ],
+
+    "v2": [
+        "zephyr-7b-beta",
+        "max_model_len_8000_Qwen3-30B-A3B-Instruct-2507",
+        "gpt-oss-120b",
+        "max_model_len_7000_Llama-3.3-70B-Instruct",
+        "Mistral-Large-Instruct-2411",
+    ],
+}
 
 ANNOTATIONS = {
 
     "multiple": [
         "voteintention/multiple/all",
         "support/multiple/all",
-        # "criticism/multiple/all"
+        "criticism/multiple/all"
     ],
 
     "binary" : [
@@ -44,9 +59,16 @@ CHOICES = {
     "binary" : ["YES", "NO"]
 }
 
+DEFAULTANSWER = {
+    "multiple": "None",
+    "binary" : "NO"
+}
+
+
+
 SETTINGS = ANNOTATIONS.keys()
 
-def parseAnwers(whole_answer, setting):
+def parseAnwers(whole_answer, model, setting):
 
     whole_answer = whole_answer \
         .strip() \
@@ -60,11 +82,13 @@ def parseAnwers(whole_answer, setting):
         .replace("·", "") \
         .replace(",", "")
 
+    if "gpt-oss" in model:
+        whole_answer = whole_answer.split("assistantfinal")[-1]
+
     if setting == "binary":
         whole_answer = whole_answer.upper()
 
-
-    annotation = whole_answer
+    annotation = DEFAULTANSWER[setting]
     for choice in CHOICES[setting]:
         if whole_answer[:len(choice)] == choice:
             annotation = choice
@@ -73,10 +97,10 @@ def parseAnwers(whole_answer, setting):
 
 def extract_data(model, annotation, setting, df=None, columns=[]):
 
-    assert model in MODELS
+    assert model in MODELS[VERSION]
     assert setting in SETTINGS
 
-    folders = glob(os.path.join(BASEPATH, "outputs/v1", f"*{model}*"))
+    folders = glob(os.path.join(OUTPUTSFOLDER, f"*{model}*"))
     assert len(folders) == 1
     folder = folders[0]
 
@@ -86,6 +110,8 @@ def extract_data(model, annotation, setting, df=None, columns=[]):
     df_free = pd.read_csv(path_free) \
         .fillna("None") \
         .rename(columns={"answer": colname})
+
+    df_free[colname] = df_free[colname].apply(lambda a: parseAnwers(a, model, setting))
 
     if df is not None:
         df = df.merge(df_free, on=['idx', 'tweet'])
@@ -99,11 +125,8 @@ def extract_data(model, annotation, setting, df=None, columns=[]):
         .fillna("None") \
         .rename(columns={"answer": colname})
 
-    if "gpt-oss" in model:
-        df_guided[colname] = df_guided[colname] \
-            .apply(lambda s: s.split("assistantfinal")[-1])
+    df_guided[colname] = df_guided[colname].apply(lambda a: parseAnwers(a, model, setting))
 
-    df_guided[colname] = df_guided[colname].apply(lambda a: parseAnwers(a, setting))
 
     df = df.merge(df_guided, on=['idx', 'tweet'])
 
@@ -111,22 +134,30 @@ def extract_data(model, annotation, setting, df=None, columns=[]):
 
     return df, columns
 
-for setting in ANNOTATIONS:
+for setting in SETTINGS:
 
     for annotation in ANNOTATIONS[setting]:
 
         df = None
         columns = ["idx", "tweet"]
 
-        for model in MODELS:
-            try:
-                df, columns = extract_data(model, annotation, setting, df, columns)
-            except Exception as exc:
-                print(exc)
-                print("Continuing...")
+        for model in MODELS[VERSION]:
+            df, columns = extract_data(model, annotation, setting, df, columns)
 
-        path = f"{annotation.replace('/', '_')}.csv"
+        models_cols_free = [c for c in df.columns[2:] if 'FREE' in c]
+        models_cols_guided = [c for c in df.columns[2:] if 'GUIDED' in c]
+        df = df.assign(freeMayorityVote=df[models_cols_free].mode(axis=1)[0])
+        df = df.assign(guidedMayorityVote=df[models_cols_guided].mode(axis=1)[0])
+        df = df.rename(columns={
+            'freeMayorityVote':"FREE-mayorityVote",
+            'guidedMayorityVote':"GUIDED-mayorityVote",
+            })
+        columns.append("FREE-mayorityVote")
+        columns.append("GUIDED-mayorityVote")
+
+        path = os.path.join(RESULTSFOLDER, f"{annotation.replace('/', '_')}.csv")
 
         df[columns].to_csv(path, index=False)
+
         print(f"Results for annotation {annotation} results saved at {path}")
         os.system(f"xan shuffle {path} | xan slice -l 5 | xan v")

@@ -1,23 +1,39 @@
 import os
+import csv
+import json
 import numpy as np
 import pandas as pd
 from sklearn.metrics import precision_recall_fscore_support
 
 BASEPATH = "/home/jimena/work/dev/llmBenchmarks/tweetsOffilineMultiGPU"
-METRICSFOLDER = os.path.join(BASEPATH, "metrics/v1")
+GTFILE = os.path.join(BASEPATH, "gt_200_sampled_xan_seed_123_fr_en.csv")
+VERSION = "v2"
+RESULTSFOLDER = os.path.join(BASEPATH, "joint_results", VERSION)
+METRICSFOLDER = os.path.join(BASEPATH, "metrics", VERSION)
 
-MODELS = [
-    "zephyr-7b-beta",
-    "gpt-oss-20b",
-    "Mistral-Small-3.1-24B-Instruct-2503",
-    "Magistral-Small-2506",
-    "Mistral-Small-24B-Instruct-2501",
-    "max_model_len_8000_Qwen3-30B-A3B-Instruct-2507",
-    "gpt-oss-120b",
-    "Llama-3.3-70B-Instruct",
-    "DeepSeek-R1-Distill-Llama-70B",
-    "Mistral-Large-Instruct-2411"
-]
+MODELS = {
+    "v1": [
+        "zephyr-7b-beta",
+        "gpt-oss-20b",
+        "Mistral-Small-3.1-24B-Instruct-2503",
+        "Magistral-Small-2506",
+        "Mistral-Small-24B-Instruct-2501",
+        "max_model_len_8000_Qwen3-30B-A3B-Instruct-2507",
+        "gpt-oss-120b",
+        "Llama-3.3-70B-Instruct",
+        "max_model_len_7000_Llama-3.3-70B-Instruct",
+        "DeepSeek-R1-Distill-Llama-70B",
+        "Mistral-Large-Instruct-2411"
+    ],
+
+    "v2": [
+        "zephyr-7b-beta",
+        "max_model_len_8000_Qwen3-30B-A3B-Instruct-2507",
+        "gpt-oss-120b",
+        "max_model_len_7000_Llama-3.3-70B-Instruct",
+        "Mistral-Large-Instruct-2411",
+    ],
+}
 
 NBPARAMS = {
     "zephyr-7b-beta": 7,
@@ -28,14 +44,28 @@ NBPARAMS = {
     "max_model_len_8000_Qwen3-30B-A3B-Instruct-2507": 30,
     "gpt-oss-120b": 120,
     "Llama-3.3-70B-Instruct": 70,
+    "max_model_len_7000_Llama-3.3-70B-Instruct": 70,
     "DeepSeek-R1-Distill-Llama-70B": 70,
-    "Mistral-Large-Instruct-2411": 123
+    "Mistral-Large-Instruct-2411": 123,
+    "mayorityVote": -1,
 }
+
+KINDS = [
+    "FREE",
+    "GUIDED",
+]
+
+SUPPORTCHOICES = {
+    "multiple": ["Macron", "Mélenchon", "Le Pen"],
+    "binary" : ["YES"]
+}
+
+NBDECIMALS = 2
 
 ANNOTATIONS = [
     "voteintention/multiple/all",
     "support/multiple/all",
-    # "criticism/multiple/all"
+    "criticism/multiple/all",
     "criticism/binary/lepen",
     "criticism/binary/macron",
     "criticism/binary/melenchon",
@@ -50,65 +80,119 @@ ANNOTATIONS = [
 
 for annotation in ANNOTATIONS:
 
-    file = f"joint_results/{annotation.replace('/', '_')}.csv"
+    file = os.path.join(RESULTSFOLDER, f"{annotation.replace('/', '_')}.csv")
     candidate = annotation.split('/')[-1]
     setting = annotation.split('/')[1]
     task = annotation.split('/')[0]
     column = f"{candidate.upper()} {task.upper()}"
 
-    gt = pd.read_csv("gt_200_sampled_xan_seed_123_fr_en.csv")[column].tolist()
-    annotations = pd.read_csv(file)
+    # gt = pd.read_csv(GTFILE, dtype=str)[column].tolist()
+    # annotations = pd.read_csv(file)
+
+    with open(GTFILE, 'r') as csvfile:
+        reader = csv.DictReader(csvfile)
+        gt = [r[column] for r in reader]
+
+    with open(file, 'r') as csvfile:
+        reader = csv.DictReader(csvfile)
+        annotations = [r for r in reader]
 
     idxs = range(len(gt))
 
     metrics = []
-    for model in MODELS:
+    for model in MODELS[VERSION]:
 
-        experiment = f"GUIDED-{model}"
-        if not experiment in annotations:
-            continue
-        ann = annotations[experiment].tolist()
+        model_abb = model.split('000_')[-1]
 
-        # binary classification
-        if setting == "binary":
-            res = precision_recall_fscore_support(
-                y_true=gt,
-                y_pred=ann,
-                labels=['YES'],
-                average='weighted',
-                zero_division=np.nan)
-            metrics.append({
-                "model": model,
-                "params": NBPARAMS[model],
-                "precision": res[0],
-                "recall": res[1],
-                "f1": res[2],
-                })
+        for kind in KINDS:
+            experiment = f"{kind}-{model}"
 
-        # multiclass classification
-        if setting == "multiple":
+            ann = [a[experiment] for a in annotations]
 
-            # Calculate metrics for each label, and find their average weighted by support
-            # (the number of true instances for each label).
-            # This alters ‘macro’ to account for label imbalance;
-            # it can result in an F-score that is not between precision and recall.
-            # Weighted recall is equal to accuracy.
-            # See: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_recall_fscore_support.html
+            # binary classification
+            if setting == "binary":
+                res = precision_recall_fscore_support(
+                    y_true=gt,
+                    y_pred=ann,
+                    pos_label='YES',
+                    average='binary',
+                    zero_division=np.nan)
 
-            res = precision_recall_fscore_support(
-                y_true=gt, y_pred=ann, average="weighted", zero_division=np.nan)
+                res = list(res)
+                support =  sum([1 if _ == 'YES' else 0 for _ in gt])
 
-            metrics.append({
-                "model": model,
-                "params": NBPARAMS[model],
-                "precision": res[0],
-                "recall": res[1],
-                "f1": res[2],
-                })
+                metrics.append({
+                    "model": model_abb,
+                    "kind": kind,
+                    "params [B]": NBPARAMS[model],
+                    "precision": str(res[0])[:NBDECIMALS + 2],
+                    "recall": str(res[1])[:NBDECIMALS + 2],
+                    "f1_weighted": str(res[2])[:NBDECIMALS + 2],
+                    "support": support,
+                    "labels": ' | '.join(SUPPORTCHOICES[setting])
+                    })
+
+            # multiclass classification
+            if setting == "multiple":
+
+                # Calculate metrics for each label, and find their average weighted by support
+                # (the number of true instances for each label).
+                # This alters ‘macro’ to account for label imbalance;
+                # it can result in an F-score that is not between precision and recall.
+                # Weighted recall is equal to accuracy.
+                # See: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_recall_fscore_support.html
+
+                res = precision_recall_fscore_support(
+                    y_true=gt,
+                    y_pred=ann,
+                    labels=SUPPORTCHOICES['multiple'],
+                    average=None,
+                    zero_division=np.nan)
+
+                f1_macro = precision_recall_fscore_support(
+                    y_true=gt,
+                    y_pred=ann,
+                    labels=SUPPORTCHOICES['multiple'],
+                    average='macro',
+                    zero_division=np.nan)[2]
+
+                f1_micro = precision_recall_fscore_support(
+                    y_true=gt,
+                    y_pred=ann,
+                    labels=SUPPORTCHOICES['multiple'],
+                    average='micro',
+                    zero_division=np.nan)[2]
+
+                f1_weighted = precision_recall_fscore_support(
+                    y_true=gt,
+                    y_pred=ann,
+                    labels=SUPPORTCHOICES['multiple'],
+                    average='weighted',
+                    zero_division=np.nan)[2]
+
+                metrics.append({
+                    "model": model_abb,
+                    "kind": kind,
+                    "params [B]": NBPARAMS[model],
+                    "support": ' | '.join(map(str, res[3])),
+                    "labels": ' | '.join(SUPPORTCHOICES[setting]),
+                    # "precision": ' | '.join([str(r)[:NBDECIMALS + 2] for r in res[0]]),
+                    # "recall": ' | '.join([str(r)[:NBDECIMALS + 2] for r in res[1]]),
+                    "f1_binary": ' | '.join([str(r)[:NBDECIMALS + 2] for r in res[2]]),
+                    "f1_macro": str(f1_macro)[:NBDECIMALS + 2],
+                    "f1_micro":  str(f1_micro)[:NBDECIMALS + 2],
+                    "f1_weighted": str(f1_weighted)[:NBDECIMALS + 2],
+                    })
 
 
-    df = pd.DataFrame.from_records(metrics).sort_values(by="params")
+    df = pd.DataFrame.from_records(metrics).sort_values(by=["params [B]", "kind"])
     path = os.path.join(METRICSFOLDER, f"{annotation.replace('/', '_')}.csv")
     df.to_csv(path, index=False)
     print(f"Metrics for annotation {annotation} experiment saved at {path}")
-    os.system(f"xan v {path}")
+    os.system(f"xan v  {path}")
+
+    # df = pd.DataFrame.from_records(metrics).sort_values(by=["f1_weighted"], ascending=False)
+    # path = os.path.join(METRICSFOLDER, f"{annotation.replace('/', '_')}.csv")
+    # df.to_csv(path, index=False)
+    # print(f"Metrics for annotation {annotation} experiment saved at {path}")
+    # os.system(f"xan v -l 3 {path}")
