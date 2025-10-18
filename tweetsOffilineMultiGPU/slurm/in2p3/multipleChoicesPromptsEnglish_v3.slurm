@@ -51,10 +51,10 @@ echo ""
 cmd="python ${BASEPATH}/tweets.py \
        --model_params=${MODELPARAMS} \
        --sampling_params=${SAMPLINGPARAMS} \
-       --tweets_file=${BASEPATH}/200_sampled_xan_seed_123_fr_en.csv \
-       --tweets_column=cleaned_text2annotate \
-       --system_prompt='Tu es un expert en politique française.' \
-       --user_prompt='S'il te plaît classifie ce message sur les réseaux sociaux (publié dans les semaines précédant l'élection présidentielle française de 2022) selon qu'il exprime explicitement l'intention de vote de son auteur ou appelle à voter pour Macron, Mélenchon ou Le Pen lors de cette élection, ou qu'il n'exprime aucun de ces votes. Ta réponse doit se baser uniquement sur les informations contenues dans le message. N'assume pas qu'un message contenant uniquement des opinions positives sur un candidat exprime explicitement l'intention de voter pour ce candidat. N'assume pas qu'un message correspondant aux opinions ou aux positions politiques d'un candidat exprime nécessairement l'intention de voter pour ce candidat. Ne confonds pas un retweets, le discours indirect ou une citation avec l'opinion de l'auteur du message. Soit concis et répond uniquement en indiquant le nom de famille du candidat ou la mention « Aucun ». Voici le message: \${tweet}' \
+       --tweets_file=${BASEPATH}/400_balanced_sampled_xan_seed_999_fr_en.csv \
+       --tweets_column=english \
+       --system_prompt='You are an expert on French politics.' \
+       --user_prompt='Please classify the following social media message (published in the weeks leading up to the 2022 French presidential election) according to whether it explicitly expresses the intention of the author to vote or calls for voting for Macron, Mélenchon, or Le Pen in that election, or expresses neither of these votes. Your response should be based solely on the information contained in the message. Do not assume that a message containing only positive opinions about a particular candidate explicitly expresses the intention to vote for that candidate. Do not assume that a message corresponding to the opinions or political positions of a particular candidate necessarily expresses the intention to vote for that candidate. Do not confuse retweets, indirect speech or a quote to another person with the opinion of the author of the message. Be concise and respond only with the last name or the word "None." Here is the message: \${tweet}' \
        --guided_choice=${CHOICES} \
        --outfolder=${OUTFOLDER}/voteintention/multiple/all"
 echo "[RUNNING] ${cmd}"
