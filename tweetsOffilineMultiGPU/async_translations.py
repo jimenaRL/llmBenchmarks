@@ -2,6 +2,7 @@ import os
 import csv
 import time
 import asyncio
+import numpy as np
 from argparse import ArgumentParser
 
 from openai import OpenAI
@@ -13,6 +14,7 @@ ap.add_argument('--batch_size', type=int, default=10000)
 
 args = ap.parse_args()
 limit = args.limit
+nbgpus = args.nbgpus
 batch_size = args.batch_size
 
 results_folder = "/sps/humanum/user/jroyolet/dev/llmBenchmarks/tweetsOffilineMultiGPU/translations/mistralai_Mistral-7B-Instruct-v0.2"
@@ -38,7 +40,7 @@ while not model:
     try:
         model = client.models.list().data[0].id
     except Exception as e:
-        print(f"Model not ready: {e}")
+        print(f"Model not ready: {e}. Waiting 30 more seconds...")
         time.sleep(30)
 print(f"Model is ready: {model} !")
 
