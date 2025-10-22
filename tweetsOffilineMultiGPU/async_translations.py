@@ -11,11 +11,13 @@ ap = ArgumentParser()
 ap.add_argument('--limit', type=int, default=-1)
 ap.add_argument('--nbgpus', type=int, default=1)
 ap.add_argument('--batch_size', type=int, default=10000)
+ap.add_argument('--batch_idx_start', type=int, default=0)
 
 args = ap.parse_args()
 limit = args.limit
 nbgpus = args.nbgpus
 batch_size = args.batch_size
+batch_idx_start = args.batch_idx_start
 
 results_folder = "/sps/humanum/user/jroyolet/dev/llmBenchmarks/tweetsOffilineMultiGPU/translations/mistralai_Mistral-7B-Instruct-v0.2"
 
@@ -23,10 +25,10 @@ results_folder = "/sps/humanum/user/jroyolet/dev/llmBenchmarks/tweetsOffilineMul
 file = "/sps/humanum/user/jroyolet/dev/llmBenchmarks/tweetsOffilineMultiGPU/cleaned_text2annotate_2022-03-27_2022-04-25.csv"
 with open(file, 'r') as f:
     reader = csv.reader(f)
-    tweets = [l[0] for l in reader][:limit]
+    tweets = [[n, l[0]] for n, l in enumerate(reader)][:limit]
 
 # Run vllm server
-vllm_serve_command = f'vllm serve "mistralai/Mistral-7B-Instruct-v0.2" --disable-log-stats --disable-log-requests --tensor-parallel-size {nbgpus} &'
+vllm_serve_command = f'vllm serve "mistralai/Mistral-7B-Instruct-v0.2" --tensor-parallel-size {nbgpus} &'
 print(f"[RUNNING] {vllm_serve_command}")
 os.system(vllm_serve_command)
 
@@ -49,8 +51,8 @@ async def doCompletetion(tweet):
     res = client.responses.create(
         model="mistralai/Mistral-7B-Instruct-v0.2",
         instructions="Please translate the following text from french to english.",
-        input=tweet)
-    return tweet, res.output_text
+        input=tweet[1])
+    return tweet[0], tweet[1], res.output_text
 
 async def tweetsIterator(start, end):
     for tweet in tweets[start:end]:
@@ -75,6 +77,9 @@ batchl[-1][1] = min(data_length,  batchl[-1][1])
 
 for batch_idx, b in enumerate(batchl):
 
+        if batch_idx < batch_idx_start:
+            continue
+
         # Run all courutines
         start = time.time()
         results = asyncio.run(run_all(start=b[0], end=b[1]))
@@ -83,7 +88,7 @@ for batch_idx, b in enumerate(batchl):
 
         # save to file
         headers = ["fr", f"en"]
-        results_file = os.path.join(results_folder, f"translations_{batch_idx}.csv")
+        results_file = os.path.join(results_folder, f"translations_{b[0]}_{b[1]}.csv")
         with open(results_file, 'w') as f:
             writer =  csv.writer(f)
             writer.writerow(headers)
