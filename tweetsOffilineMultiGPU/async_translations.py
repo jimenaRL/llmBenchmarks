@@ -87,17 +87,17 @@ for batch_idx, b in enumerate(batchl):
 
         # If batch already computed continue or lock is granted, continue
         if os.path.exists(file):
-            logger.info(f"Already computed file at {file}. Continuing.")
+            print(f"Already computed file at {file}. Continuing.")
             continue
 
         if os.path.exists(lockfile):
-            logger.info(f"Found active lock for file at {file}. Continuing.")
+            print(f"Found active lock for file at {file}. Continuing.")
             continue
 
         # If not, create lock and start batch computation
         with open(lockfile, 'w') as f:
             csv.writer(f).writerow(headers)
-        logger.info(f"Computing batch at index {batch_idx}...")
+        print(f"Computing batch at index {batch_idx}...")
 
         # Run all courutines
         start = time.time()
