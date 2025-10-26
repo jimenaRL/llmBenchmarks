@@ -82,7 +82,7 @@ for batch_idx, b in enumerate(batchl):
         if batch_idx < batch_idx_start:
             continue
 
-        file = os.path.join(results_folder, f"translations_{b[0]}_{b[1]}.csv")
+        file = os.path.join(results_folder, f"translations_{batch_idx}.csv")
         lockfile = file + ".lock"
 
         # If batch already computed continue or lock is granted, continue
