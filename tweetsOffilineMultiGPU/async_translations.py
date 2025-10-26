@@ -75,10 +75,29 @@ batchl = [
 ]
 batchl[-1][1] = min(data_length,  batchl[-1][1])
 
+headers = ["fr", "en"]
+
 for batch_idx, b in enumerate(batchl):
 
         if batch_idx < batch_idx_start:
             continue
+
+        file = os.path.join(results_folder, f"translations_{b[0]}_{b[1]}.csv")
+        lockfile = file + ".lock"
+
+        # If batch already computed continue or lock is granted, continue
+        if os.path.exists(file):
+            logger.info(f"Already computed file at {file}. Continuing.")
+            continue
+
+        if os.path.exists(lockfile):
+            logger.info(f"Found active lock for file at {file}. Continuing.")
+            continue
+
+        # If not, create lock and start batch computation
+        with open(lockfile, 'w') as f:
+            csv.writer(f).writerow(headers)
+        logger.info(f"Computing batch at index {batch_idx}...")
 
         # Run all courutines
         start = time.time()
@@ -87,10 +106,11 @@ for batch_idx, b in enumerate(batchl):
         print(f"Took {end - start} seconds.")
 
         # save to file
-        headers = ["fr", f"en"]
-        results_file = os.path.join(results_folder, f"translations_{b[0]}_{b[1]}.csv")
-        with open(results_file, 'w') as f:
+        with open(file, 'w') as f:
             writer =  csv.writer(f)
             writer.writerow(headers)
             writer.writerows(results)
-        print(f"LLM answers (={len(results)}) saved to {results_file}")
+        print(f"LLM answers (={len(results)}) saved to {file}")
+
+        # and release lock
+        os.system(f"rm {lockfile}")
