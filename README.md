@@ -5,6 +5,7 @@
 
 Scripts usage example: 
 
+
 ```
 time python asyncChatBenchmark.py \    
     --framework={vllm or tgi} \
