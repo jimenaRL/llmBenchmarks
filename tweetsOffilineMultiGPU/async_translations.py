@@ -28,7 +28,7 @@ with open(file, 'r') as f:
     tweets = [[n, l[0]] for n, l in enumerate(reader)][:limit]
 
 # Run vllm server
-vllm_serve_command = f'vllm serve "mistralai/Mistral-7B-Instruct-v0.2" --tensor-parallel-size {nbgpus} &'
+vllm_serve_command = f'vllm serve "mistralai/Mistral-7B-Instruct-v0.2" --disable-log-requests --disable-log-stats --tensor-parallel-size {nbgpus} &'
 print(f"[RUNNING] {vllm_serve_command}")
 os.system(vllm_serve_command)
 
@@ -75,7 +75,7 @@ batchl = [
 ]
 batchl[-1][1] = min(data_length,  batchl[-1][1])
 
-headers = ["fr", "en"]
+headers = ["idx","fr", "en"]
 
 for batch_idx, b in enumerate(batchl):
 
